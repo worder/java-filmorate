@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = FilmReleaseDateValidator.class)
 public @interface FilmReleaseDate {
-    String message() default "Movie release date should be after 29.12.1895";
+    String message() default "Movie release date should be after 28.12.1895";
 
     Class<?>[] groups() default {};
 

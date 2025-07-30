@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 public class InMemoryUserManager implements UserManager {
@@ -35,7 +32,7 @@ public class InMemoryUserManager implements UserManager {
     }
 
     public Collection<User> getAll() {
-        return this.users.values();
+        return new ArrayList<>(this.users.values());
     }
 
     private int getNextId() {

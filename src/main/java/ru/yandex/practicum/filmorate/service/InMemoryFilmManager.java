@@ -2,10 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class InMemoryFilmManager implements FilmManager {
 
@@ -32,7 +29,7 @@ public class InMemoryFilmManager implements FilmManager {
     }
 
     public Collection<Film> getAll() {
-        return this.films.values();
+        return new ArrayList<>(this.films.values());
     }
 
     private int getNextId() {

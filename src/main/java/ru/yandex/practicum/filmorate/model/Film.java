@@ -9,12 +9,14 @@ import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.annotation.FilmReleaseDate;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Value
 @Builder(toBuilder = true)
 public class Film {
     Integer id;
+    Set<Integer> likes;
 
     @NotBlank(message = "Film name should not be empty")
     String name;

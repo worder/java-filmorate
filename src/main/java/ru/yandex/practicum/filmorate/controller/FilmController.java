@@ -1,43 +1,55 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmManager;
-import ru.yandex.practicum.filmorate.service.InMemoryFilmManager;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/films")
 @Slf4j
+@RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
-
-    FilmManager manager = new InMemoryFilmManager();
+    private final FilmStorage storage;
+    private final FilmService service;
 
     @GetMapping
     public Collection<Film> getAll() {
-        return manager.getAll();
+        return storage.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable Integer id) {
+        return storage.get(id);
+    }
+
+    @GetMapping("/popular")
+    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
+        return service.getPopularFilms(count);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        Film addedFilm = manager.add(film);
-        log.debug("Created film with id: {}", addedFilm.getId());
-        return addedFilm;
+        return storage.add(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        if (manager.get(film.getId()).isEmpty()) {
-            log.warn("Try to update with unknown id: {}", film);
-            throw new NotFoundException("Invalid id provided");
-        }
-        manager.update(film);
-        log.debug("Updated film: {}", film);
+        return storage.update(film);
+    }
 
-        return film;
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@PathVariable Integer id, @PathVariable Integer userId) {
+        return service.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film removeLike(@PathVariable Integer id, @PathVariable Integer userId) {
+        return service.removeLike(id,  userId);
     }
 }

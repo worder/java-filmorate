@@ -1,14 +1,13 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
-import java.util.Optional;
 
-public interface FilmManager {
+public interface FilmStorage {
     Film add(Film film);
 
-    Optional<Film> get(Integer id);
+    Film get(Integer id);
 
     Film update(Film film);
 

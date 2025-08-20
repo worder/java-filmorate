@@ -1,17 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Value;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Value
 @Builder(toBuilder = true)
 public class User {
     Integer id;
+    Set<Integer> friends;
 
     @Email(message = "Email should be valid")
     String email;

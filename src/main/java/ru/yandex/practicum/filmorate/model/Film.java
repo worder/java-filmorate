@@ -29,6 +29,10 @@ public class Film {
     @Positive(message = "Movie duration should be positive number")
     Integer duration;
 
+    Set<String> genre;
+
+    String mpaRating;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

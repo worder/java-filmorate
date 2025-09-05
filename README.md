@@ -1,2 +1,4 @@
-# java-filmorate
-Template repository for Filmorate project.
+# Java Filmorate
+
+## Схема БД
+![alt text](er-diagram.png)

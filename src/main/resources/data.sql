@@ -6,7 +6,7 @@ MERGE INTO genres (id, name) VALUES
     (5, 'Документальный'),
     (6, 'Боевик');
 
-MERGE INTO mpa_rating (id, name) VALUES
+MERGE INTO mpa_ratings (id, name) VALUES
     (1, 'G'),
     (2, 'PG'),
     (3, 'PG-13'),

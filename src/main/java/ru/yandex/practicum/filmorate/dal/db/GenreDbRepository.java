@@ -15,9 +15,11 @@ import java.util.Set;
 public class GenreDbRepository extends BaseDbRepository<Genre> implements GenreRepository {
     private final static String FIND_ALL_QUERY = "SELECT * FROM genres";
     private final static String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE id = ?";
-    private final static String FIND_BY_FILM_ID_QUERY = "SELECT g.id, g.name FROM film_genres fg " +
-            "JOIN genres g ON g.id=fg.film_id " +
-            "WHERE fg.film_id = ?";
+    private final static String FIND_BY_FILM_ID_QUERY =
+            "SELECT g.id, g.name " +
+                    "FROM film_genres fg " +
+                    "JOIN genres g ON g.id=fg.genre_id " +
+                    "WHERE fg.film_id = ?";
 
     public GenreDbRepository(JdbcTemplate db, RowMapper<Genre> mapper) {
         super(db, mapper);

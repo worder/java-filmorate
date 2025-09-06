@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface FilmRepository {
     Collection<Film> findAll();
 
+    Collection<Film> findPopular(int count);
+
     Optional<Film> findById(Long id);
 
     Film save(Film film);

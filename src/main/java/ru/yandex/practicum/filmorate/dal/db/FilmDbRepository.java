@@ -1,40 +1,67 @@
 package ru.yandex.practicum.filmorate.dal.db;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-@Primary @Repository("filmDbRepository")
+@Primary
+@Repository("filmDbRepository")
 public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepository {
-    private static final String FIND_ALL_QUERY = "SELECT f.*, m.id AS mpa_id, m.name AS mpa_name " +
-            "FROM films f " +
-            "JOIN mpa_ratings m ON m.id=f.mpa_rating_id";
-    private static final String FIND_BY_ID_QUERY = "SELECT f.*, m.id AS mpa_id, m.name AS mpa_name "
-            + "FROM films f "
-            + "JOIN mpa_ratings m ON m.id=f.mpa_rating_id "
-            + "WHERE f.id = ?";
-    private static final String INSERT_FILM_QUERY = "INSERT INTO films " +
-            "(name, description, release_date, duration, mpa_rating_id) " +
-            "VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_FILM_QUERY = "UPDATE films " +
-            "SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?";
+    private static final String SELECT_FILM_WITH_MPA = "SELECT f.*, m.id AS mpa_id, m.name AS mpa_name ";
+    private static final String JOIN_MPA = "JOIN mpa_ratings m ON m.id=f.mpa_rating_id ";
+
+    private static final String FIND_ALL_QUERY =
+            SELECT_FILM_WITH_MPA +
+                    "FROM films f " +
+                    JOIN_MPA;
+
+    private static final String FIND_BY_ID_QUERY =
+            SELECT_FILM_WITH_MPA +
+                    "FROM films f " +
+                    JOIN_MPA +
+                    "WHERE f.id = ?";
+
+    private static final String INSERT_FILM_QUERY =
+            "INSERT INTO films " +
+                    "(name, description, release_date, duration, mpa_rating_id) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+    private static final String INSERT_FILM_GENRE_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+
+    private static final String UPDATE_FILM_QUERY =
+            "UPDATE films " +
+                    "SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?";
+
+    private static final String FIND_POPULAR_QUERY =
+            SELECT_FILM_WITH_MPA + ", count(f.id) AS likes_count " +
+                    "FROM films f " +
+                    JOIN_MPA +
+                    "JOIN film_likes fl ON f.id=fl.film_id " +
+                    "GROUP BY f.id " +
+                    "ORDER BY likes_count DESC " +
+                    "LIMIT ?";
+
+    private final JdbcTemplate db;
 
     public FilmDbRepository(JdbcTemplate db, RowMapper<Film> mapper) {
         super(db, mapper);
+        this.db = db;
     }
 
+    @Override
     public Film save(Film film) {
         MpaRating mpa = film.getMpa();
-        long id = this.insert(
+        long newFilmId = this.insert(
                 INSERT_FILM_QUERY,
                 film.getName(),
                 film.getDescription(),
@@ -42,9 +69,18 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
                 film.getDuration(),
                 mpa != null ? mpa.getId() : null
         );
-        return film.toBuilder().id(id).build();
+
+        Set<Genre> genres = film.getGenres();
+        if (genres != null) {
+            for (Genre g : genres) {
+                db.update(INSERT_FILM_GENRE_QUERY, newFilmId, g.getId());
+            }
+        }
+
+        return film.toBuilder().id(newFilmId).build();
     }
 
+    @Override
     public Film update(Film film) {
         MpaRating mpa = film.getMpa();
         this.update(UPDATE_FILM_QUERY,
@@ -57,11 +93,18 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
         return film;
     }
 
+    @Override
     public Optional<Film> findById(Long id) {
         return this.findOne(FIND_BY_ID_QUERY, id);
     }
 
+    @Override
     public List<Film> findAll() {
         return this.findMany(FIND_ALL_QUERY);
+    }
+
+    @Override
+    public List<Film> findPopular(int count) {
+        return this.findMany(FIND_POPULAR_QUERY, count);
     }
 }

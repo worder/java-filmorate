@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
@@ -11,12 +12,11 @@ import ru.yandex.practicum.filmorate.exception.InvalidArgumentException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.dal.FilmRepository;
-import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -30,6 +30,16 @@ public class FilmService {
         return storage.findAll().stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
+    }
+
+    public List<FilmDto> getPopularFilms(Integer count) {
+        if (count > 0) {
+            return storage.findPopular(count).stream()
+                    .map(FilmMapper::mapToFilmDto)
+                    .toList();
+        }
+
+        throw new InvalidArgumentException("Count should be > 0");
     }
 
     public FilmDto getFilmById(Long id) {
@@ -62,6 +72,10 @@ public class FilmService {
         log.info("Updated film: {} from data: {}", updatedFilm, request);
 
         return FilmMapper.mapToFilmDto(updatedFilm);
+    }
+
+    public boolean filmExists(Long id) {
+        return this.storage.findById(id).isPresent();
     }
 
     private void validateGenres(Set<Genre> genres) {

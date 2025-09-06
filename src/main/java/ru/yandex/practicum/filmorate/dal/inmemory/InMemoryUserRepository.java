@@ -6,10 +6,7 @@ import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component("inMemoryUserRepository")
 public class InMemoryUserRepository implements UserRepository {
@@ -21,6 +18,16 @@ public class InMemoryUserRepository implements UserRepository {
     public Collection<User> findAll() {
         return this.users.values().stream()
                 .map(this::ensureUserName).toList();
+    }
+
+    @Override
+    public Collection<User> findUserFriends(Long id) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Collection<User> findCommonFriends(Long userId, Long otherUserId) {
+        return new ArrayList<>();
     }
 
     @Override

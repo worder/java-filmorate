@@ -47,11 +47,9 @@ public class UserService {
         throw new NotFoundException("User update failed, user not found");
     }
 
-
-
-
-
-
+    public boolean userExists(Long userId) {
+        return storage.findById(userId).isPresent();
+    }
 
 
 //    private final BiFunction<User, User, User> addFriend = (User user1, User user2) -> {

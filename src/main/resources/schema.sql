@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS user_friends (
   user_id bigint REFERENCES users,
   friend_id bigint REFERENCES users,
-  is_accepted bool NOT NULL,
+  is_accepted bool NOT NULL DEFAULT false,
   PRIMARY KEY (user_id, friend_id)
 );
 

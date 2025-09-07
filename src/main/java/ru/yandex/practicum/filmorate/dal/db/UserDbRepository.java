@@ -17,46 +17,26 @@ import java.util.Optional;
 public class UserDbRepository extends BaseDbRepository<User> implements UserRepository {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
 
-    private static final String FIND_USER_FRIENDS_QUERY =
-            "(SELECT u.* " +
-                    "FROM user_friends f " +
-                    "JOIN users u ON f.friend_id=u.id " +
-                    "WHERE f.user_id = ?) " +
-                    "UNION " +
-                    "(SELECT u.* " +
-                    "FROM user_friends f " +
-                    "JOIN users u ON f.user_id=u.id " +
-                    "WHERE f.friend_id = ? AND f.is_accepted=true)";
+    private static final String FIND_USER_FRIENDS_QUERY = """
+            (SELECT u.* FROM user_friends f JOIN users u ON f.friend_id=u.id WHERE f.user_id=?)
+            UNION
+            (SELECT u.* FROM user_friends f JOIN users u ON f.user_id=u.id WHERE f.friend_id=? AND f.is_accepted=true)
+            """;
 
-    private static final String FIND_COMMON_FRIENDS_QUERY =
-            "((SELECT u.* " +
-                    "FROM user_friends f " +
-                    "JOIN users u ON f.friend_id=u.id " +
-                    "WHERE f.user_id = ?) " +
-                    "UNION " +
-                    "(SELECT u.* " +
-                    "FROM user_friends f " +
-                    "JOIN users u ON f.user_id=u.id " +
-                    "WHERE f.friend_id = ? AND f.is_accepted=true)) " +
-                    "INTERSECT " +
-                    "((SELECT u.* " +
-                    "FROM user_friends f " +
-                    "JOIN users u ON f.friend_id=u.id " +
-                    "WHERE f.user_id = ?) " +
-                    "UNION " +
-                    "(SELECT u.* " +
-                    "FROM user_friends f " +
-                    "JOIN users u ON f.user_id=u.id " +
-                    "WHERE f.friend_id = ? AND f.is_accepted=true)) ";
+    private static final String FIND_COMMON_FRIENDS_QUERY = """
+            (%s) INTERSECT (%s)
+            """.formatted(FIND_USER_FRIENDS_QUERY, FIND_USER_FRIENDS_QUERY);
 
-    private static final String INSERT_USER_QUERY =
-            "INSERT INTO users (email, login, name, birthday) " +
-                    "VALUES (?, ?, ?, ?)";
+    private static final String INSERT_USER_QUERY = """
+            INSERT INTO users (email, login, name, birthday)
+            VALUES (?, ?, ?, ?)
+            """;
 
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
-    private static final String UPDATE_USER_QUERY =
-            "UPDATE users " +
-                    "SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+    private static final String UPDATE_USER_QUERY = """
+            UPDATE users
+            SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?
+            """;
 
     public UserDbRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);

@@ -7,11 +7,15 @@ import ru.yandex.practicum.filmorate.model.User;
 
 public class UserMapper {
     public static UserDto mapToUserDto(User user) {
+        String name = user.getName();
+        if (name.isBlank()) {
+            name = user.getLogin();
+        }
         return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .login(user.getLogin())
-                .name(user.getName())
+                .name(name)
                 .birthday(user.getBirthday())
                 .build();
     }

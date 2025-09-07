@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Repository("inMemoryFilmRepository")
 @RequiredArgsConstructor
 public class InMemoryFilmRepository implements FilmRepository {
-    private final VolatileMemoryStorage storage;
+    private final MemoryStorage storage;
 
     private int lastId = 0;
 
@@ -91,14 +91,12 @@ public class InMemoryFilmRepository implements FilmRepository {
                             .collect(Collectors.toCollection(LinkedHashSet::new))
             );
         }
-        if (filmFromStorage.getMpa() != null) {
-            if (storage.mpaRatings.containsKey(filmFromStorage.getMpa().getId())) {
-                fb.mpa(MpaRating.builder()
-                        .id(filmFromStorage.getMpa().getId())
-                        .name(storage.mpaRatings.get(filmFromStorage.getMpa().getId()))
-                        .build()
-                );
-            }
+        if (filmFromStorage.getMpa() != null && storage.mpaRatings.containsKey(filmFromStorage.getMpa().getId())) {
+            fb.mpa(MpaRating.builder()
+                    .id(filmFromStorage.getMpa().getId())
+                    .name(storage.mpaRatings.get(filmFromStorage.getMpa().getId()))
+                    .build()
+            );
         }
 
         return fb.build();

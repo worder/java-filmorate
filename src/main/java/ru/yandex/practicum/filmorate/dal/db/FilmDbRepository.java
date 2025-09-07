@@ -20,38 +20,37 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
     private static final String SELECT_FILM_WITH_MPA = "SELECT f.*, m.id AS mpa_id, m.name AS mpa_name ";
     private static final String JOIN_MPA = "JOIN mpa_ratings m ON m.id=f.mpa_rating_id ";
 
-    private static final String FIND_ALL_QUERY =
-            SELECT_FILM_WITH_MPA +
-                    "FROM films f " +
-                    JOIN_MPA;
+    private static final String FIND_ALL_QUERY = """
+            %s FROM films f %s
+            """.formatted(SELECT_FILM_WITH_MPA, JOIN_MPA);
 
-    private static final String FIND_BY_ID_QUERY =
-            SELECT_FILM_WITH_MPA +
-                    "FROM films f " +
-                    JOIN_MPA +
-                    "WHERE f.id = ?";
+    private static final String FIND_BY_ID_QUERY = """
+            %s FROM films f %s WHERE f.id = ?
+            """.formatted(SELECT_FILM_WITH_MPA, JOIN_MPA);
 
-    private static final String INSERT_FILM_QUERY =
-            "INSERT INTO films " +
-                    "(name, description, release_date, duration, mpa_rating_id) " +
-                    "VALUES (?, ?, ?, ?, ?)";
+    private static final String INSERT_FILM_QUERY = """
+            INSERT INTO films (name, description, release_date, duration, mpa_rating_id)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 
     private static final String INSERT_FILM_GENRE_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
 
     private static final String DELETE_FILM_GENRES_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
 
-    private static final String UPDATE_FILM_QUERY =
-            "UPDATE films " +
-                    "SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?";
+    private static final String UPDATE_FILM_QUERY = """
+            UPDATE films
+            SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?
+            """;
 
-    private static final String FIND_POPULAR_QUERY =
-            SELECT_FILM_WITH_MPA + ", count(f.id) AS likes_count " +
-                    "FROM films f " +
-                    JOIN_MPA +
-                    "JOIN film_likes fl ON f.id=fl.film_id " +
-                    "GROUP BY f.id " +
-                    "ORDER BY likes_count DESC " +
-                    "LIMIT ?";
+    private static final String FIND_POPULAR_QUERY = """
+            %s, count(f.id) AS likes_count
+            FROM films f
+            %s
+            JOIN film_likes fl ON f.id=fl.film_id
+            GROUP BY f.id
+            ORDER BY likes_count DESC
+            LIMIT ?
+            """.formatted(SELECT_FILM_WITH_MPA, JOIN_MPA);
 
     private final JdbcTemplate db;
 

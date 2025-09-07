@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository("inMemoryMpaRepository")
 @RequiredArgsConstructor
 public class InMemoryMpaRepository implements MpaRepository {
-    private final VolatileMemoryStorage storage;
+    private final MemoryStorage storage;
 
     @Override
     public Collection<MpaRating> findAll() {

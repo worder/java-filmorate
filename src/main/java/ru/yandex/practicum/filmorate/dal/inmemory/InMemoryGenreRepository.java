@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Repository("inMemoryGenreRepository")
 @RequiredArgsConstructor
 public class InMemoryGenreRepository implements GenreRepository {
-    private final VolatileMemoryStorage storage;
+    private final MemoryStorage storage;
 
     @Override
     public Collection<Genre> findAll() {

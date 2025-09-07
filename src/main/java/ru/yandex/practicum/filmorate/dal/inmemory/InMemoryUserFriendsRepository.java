@@ -9,7 +9,7 @@ import java.util.HashSet;
 @Repository("inMemoryUserFriendsRepository")
 @RequiredArgsConstructor
 public class InMemoryUserFriendsRepository implements UserFriendsRepository {
-    private final VolatileMemoryStorage storage;
+    private final MemoryStorage storage;
 
     public void addFriend(Long userId, Long friendId) {
         if (!storage.userFriends.containsKey(userId)) {

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class VolatileMemoryStorage {
+public class MemoryStorage {
     public final Map<Long, User> users = new HashMap<>();
     public final Map<Long, Film> films = new HashMap<>();
 
@@ -22,7 +22,7 @@ public class VolatileMemoryStorage {
     public final Map<Long, Set<Long>> userFriends = new HashMap<>();
     public final Map<Long, Set<Long>> userFriendsPending = new HashMap<>();
 
-    public VolatileMemoryStorage() {
+    public MemoryStorage() {
         this.genres = new LinkedHashMap<>();
         this.genres.put(1, "Комедия");
         this.genres.put(2, "Драма");

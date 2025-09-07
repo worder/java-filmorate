@@ -9,7 +9,7 @@ import java.util.HashSet;
 @Repository("inMemoryFilmLikesRepository")
 @RequiredArgsConstructor
 public class InMemoryFilmLikesRepository implements FilmLikesRepository {
-    private final VolatileMemoryStorage storage;
+    private final MemoryStorage storage;
 
     public void addLike(Long userId, Long filmId) {
         if (!storage.filmLikes.containsKey(filmId)) {

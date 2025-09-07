@@ -13,7 +13,7 @@ import java.util.Set;
 @Repository("inMemoryUserRepository")
 @RequiredArgsConstructor
 public class InMemoryUserRepository implements UserRepository {
-    private final VolatileMemoryStorage storage;
+    private final MemoryStorage storage;
     private long lastId = 0;
 
     @Override

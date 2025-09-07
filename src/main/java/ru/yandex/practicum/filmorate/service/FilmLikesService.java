@@ -24,7 +24,11 @@ public class FilmLikesService {
     }
 
     public void removeLike(Long userId, Long filmId) {
-        log.info("Removed like for film: {} from user: {}", filmId, userId);
-        storage.removeLike(userId, filmId);
+        if (filmService.filmExists(filmId) && userService.userExists(userId)) {
+            log.info("Removed like for film: {} from user: {}", filmId, userId);
+            storage.removeLike(userId, filmId);
+        } else {
+            throw new NotFoundException("");
+        }
     }
 }

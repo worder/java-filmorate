@@ -38,6 +38,8 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
 
     private static final String INSERT_FILM_GENRE_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
 
+    private static final String DELETE_FILM_GENRES_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
+
     private static final String UPDATE_FILM_QUERY =
             "UPDATE films " +
                     "SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?";
@@ -90,6 +92,15 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
                 film.getDuration(),
                 mpa != null ? mpa.getId() : null
         );
+
+        Set<Genre> genres = film.getGenres();
+        if (genres != null) {
+            db.update(DELETE_FILM_GENRES_QUERY, film.getId());
+            for (Genre g : genres) {
+                db.update(INSERT_FILM_GENRE_QUERY, film.getId(), g.getId());
+            }
+        }
+
         return film;
     }
 

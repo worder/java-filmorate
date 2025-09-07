@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,7 +21,11 @@ public class UserService {
 
     public UserDto createUser(NewUserRequest request) {
         User newUser = UserMapper.mapToUser(request);
-        return UserMapper.mapToUserDto(storage.save(newUser));
+
+        newUser = storage.save(newUser);
+        log.info("Created user: {} from data: {}", newUser, request);
+
+        return UserMapper.mapToUserDto(newUser);
     }
 
     public UserDto getUserById(Long id) {
@@ -35,16 +41,14 @@ public class UserService {
     }
 
     public UserDto updateUser(UpdateUserRequest request) {
-        Optional<User> user = storage.findById(request.getId())
-                .map(u -> UserMapper.updateUserFields(u, request));
+        User user = storage.findById(request.getId())
+                .map(u -> UserMapper.updateUserFields(u, request))
+                .orElseThrow(() -> new NotFoundException("User update failed, user not found"));
 
-        if (user.isPresent()) {
-            storage.update(user.get());
-            return UserMapper.mapToUserDto(user.get());
-        }
+        storage.update(user);
+        log.info("Updated user: {} from data: {}", user, request);
 
-        // TODO: add logging
-        throw new NotFoundException("User update failed, user not found");
+        return UserMapper.mapToUserDto(user);
     }
 
     public boolean userExists(Long userId) {

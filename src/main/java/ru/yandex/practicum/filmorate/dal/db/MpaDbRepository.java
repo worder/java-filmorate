@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dal.db;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -9,10 +10,11 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Primary
+@Repository("mpaDbRepository")
 public class MpaDbRepository extends BaseDbRepository<MpaRating> implements MpaRepository {
-    private final static String FIND_ALL_QUERY = "SELECT * FROM mpa_ratings";
-    private final static String FIND_BY_ID_QUERY = "SELECT * FROM mpa_ratings WHERE id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM mpa_ratings";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM mpa_ratings WHERE id = ?";
 
     public MpaDbRepository(JdbcTemplate db, RowMapper<MpaRating> mapper) {
         super(db, mapper);

@@ -1,60 +1,107 @@
 package ru.yandex.practicum.filmorate.dal.inmemory;
 
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Component("inMemoryFilmRepository")
+@Repository("inMemoryFilmRepository")
+@RequiredArgsConstructor
 public class InMemoryFilmRepository implements FilmRepository {
-    private final Map<Long, Film> films = new HashMap<>();
+    private final VolatileMemoryStorage storage;
+
     private int lastId = 0;
 
     @Override
     public Collection<Film> findAll() {
-        return new ArrayList<>(this.films.values());
+        return new ArrayList<>(storage.films.values().stream()
+                .map(this::buildFilm)
+                .toList()
+        );
     }
 
     @Override
     public Film save(Film film) {
         long id = this.getNextId();
-        Film addedFilm = film.toBuilder().id(id).build();
-        this.films.put(id, addedFilm);
-        return addedFilm;
+        Film addedFilm = film.toBuilder()
+                .id(id)
+                .build();
+        storage.films.put(id, addedFilm);
+
+        Set<Genre> genres = film.getGenres();
+        if (genres != null) {
+            storage.filmGenres.put(id, new HashSet<>());
+            for (Genre g : genres) {
+                storage.filmGenres.get(id).add(g.getId());
+            }
+        }
+
+        return this.buildFilm(addedFilm);
     }
 
     @Override
     public Optional<Film> findById(Long id) {
-        return Optional.ofNullable(films.get(id));
+        return Optional.ofNullable(this.buildFilm(storage.films.get(id)));
     }
 
     @Override
     public Film update(Film film) {
-        if (!this.films.containsKey(film.getId())) {
+        if (!storage.films.containsKey(film.getId())) {
             throw new InternalServerException("Failed to update film");
         }
 
         Film updatedFilm = film.toBuilder().build();
-        this.films.put(film.getId(), updatedFilm);
-        return updatedFilm;
+        storage.films.put(film.getId(), updatedFilm);
+
+        return this.buildFilm(updatedFilm);
     }
 
     @Override
     public Collection<Film> findPopular(int count) {
-//        if (count <= 0) {
-//            throw new InvalidArgumentException("Count should be greater than 0");
-//        }
-//
-//        Comparator<Film> likesNumComparatorAsc = Comparator.comparingInt(f -> f.getLikes().size());
-//        List<Film> sortedFilms = this.findAll().stream()
-//                .sorted(likesNumComparatorAsc.reversed())
-//                .toList();
-//
-//        return sortedFilms.subList(0, Math.min(count, sortedFilms.size()));
+        return storage.filmLikes.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().size() - e1.getValue().size())
+                .map(Map.Entry::getKey)
+                .map(this::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(this::buildFilm)
+                .limit(count)
+                .toList();
+    }
 
-        return new HashSet<>();
+    private Film buildFilm(Film filmFromStorage) {
+        if (filmFromStorage == null) {
+            return null;
+        }
+
+        Film.FilmBuilder fb = filmFromStorage.toBuilder();
+        if (storage.filmGenres.containsKey(filmFromStorage.getId())) {
+            fb.genres(
+                    storage.filmGenres.get(filmFromStorage.getId()).stream()
+                            .map(id -> Genre.builder()
+                                    .id(id)
+                                    .name(storage.genres.get(id))
+                                    .build())
+                            .collect(Collectors.toCollection(LinkedHashSet::new))
+            );
+        }
+        if (filmFromStorage.getMpa() != null) {
+            if (storage.mpaRatings.containsKey(filmFromStorage.getMpa().getId())) {
+                fb.mpa(MpaRating.builder()
+                        .id(filmFromStorage.getMpa().getId())
+                        .name(storage.mpaRatings.get(filmFromStorage.getMpa().getId()))
+                        .build()
+                );
+            }
+        }
+
+        return fb.build();
     }
 
     private int getNextId() {

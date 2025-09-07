@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmLikesRepository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;

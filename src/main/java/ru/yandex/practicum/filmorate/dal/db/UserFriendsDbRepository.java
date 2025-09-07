@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.dal.db;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.UserFriendsRepository;
 
-@Repository
+@Primary
+@Repository("userFriendsDbRepository")
 @RequiredArgsConstructor
 public class UserFriendsDbRepository implements UserFriendsRepository {
     private static final String INSERT_QUERY = "INSERT INTO user_friends (user_id, friend_id) VALUES (?, ?)";

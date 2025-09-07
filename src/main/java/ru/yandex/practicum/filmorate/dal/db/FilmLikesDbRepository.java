@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.dal.db;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.FilmLikesRepository;
 
-@Repository
+@Primary
+@Repository("filmLikesDbRepository")
 @RequiredArgsConstructor
 public class FilmLikesDbRepository implements FilmLikesRepository {
     private static final String INSERT_QUERY = "INSERT INTO film_likes (user_id, film_id) VALUES (?, ?)";

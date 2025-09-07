@@ -1,56 +1,73 @@
 package ru.yandex.practicum.filmorate.dal.inmemory;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.UserRepository;
-import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
-@Component("inMemoryUserRepository")
+@Repository("inMemoryUserRepository")
+@RequiredArgsConstructor
 public class InMemoryUserRepository implements UserRepository {
-
-    private final Map<Long, User> users = new HashMap<>();
+    private final VolatileMemoryStorage storage;
     private long lastId = 0;
 
     @Override
     public Collection<User> findAll() {
-        return this.users.values().stream()
+        return storage.users.values().stream()
                 .map(this::ensureUserName).toList();
     }
 
     @Override
     public Collection<User> findUserFriends(Long id) {
+        if (storage.userFriends.containsKey(id)) {
+            return storage.userFriends.get(id).stream()
+                    .map(this::findById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .toList();
+        }
         return new ArrayList<>();
     }
 
     @Override
     public Collection<User> findCommonFriends(Long userId, Long otherUserId) {
-        return new ArrayList<>();
+        Set<Long> userFriends = storage.userFriends.get(userId);
+        Set<Long> otherUserFriends = storage.userFriends.get(otherUserId);
+
+        if (userFriends == null || otherUserFriends == null) {
+            return new ArrayList<>();
+        }
+
+        return userFriends.stream()
+                .filter(otherUserFriends::contains)
+                .map(this::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return Optional.ofNullable(users.get(id)).map(this::ensureUserName);
+        return Optional.ofNullable(storage.users.get(id)).map(this::ensureUserName);
     }
 
     @Override
     public User save(User user) {
         long id = this.getNextId();
         User addedUser = user.toBuilder().id(id).build();
-        this.users.put(id, addedUser);
+        this.storage.users.put(id, addedUser);
         return addedUser;
     }
 
     @Override
     public User update(User user) {
-        if (!this.users.containsKey(user.getId())) {
-            throw new InternalServerException("Failed to update user");
-        }
-
         User updatedUser = user.toBuilder().build();
-        this.users.put(user.getId(), updatedUser);
+        storage.users.put(user.getId(), updatedUser);
         return updatedUser;
     }
 

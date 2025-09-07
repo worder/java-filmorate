@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dal.db;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -11,11 +12,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@Repository
+@Primary
+@Repository("genreDbRepository")
 public class GenreDbRepository extends BaseDbRepository<Genre> implements GenreRepository {
-    private final static String FIND_ALL_QUERY = "SELECT * FROM genres";
-    private final static String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE id = ?";
-    private final static String FIND_BY_FILM_ID_QUERY =
+    private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE id = ?";
+    private static final String FIND_BY_FILM_ID_QUERY =
             "SELECT g.id, g.name " +
                     "FROM film_genres fg " +
                     "JOIN genres g ON g.id=fg.genre_id " +

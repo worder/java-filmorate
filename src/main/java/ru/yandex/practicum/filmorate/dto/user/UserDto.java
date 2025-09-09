@@ -1,15 +1,13 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.user;
 
 import lombok.Builder;
-import lombok.ToString;
 import lombok.Value;
 
 import java.time.LocalDate;
 
 @Value
 @Builder(toBuilder = true)
-@ToString
-public class User {
+public class UserDto {
     Long id;
     String email;
     String login;

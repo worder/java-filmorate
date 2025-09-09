@@ -1,16 +1,16 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.film;
 
 import lombok.Builder;
-import lombok.ToString;
 import lombok.Value;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @Value
-@Builder(toBuilder = true)
-@ToString
-public class Film {
+@Builder
+public class FilmDto {
     Long id;
     String name;
     String description;

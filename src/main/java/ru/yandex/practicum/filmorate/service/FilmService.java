@@ -42,6 +42,20 @@ public class FilmService {
         throw new InvalidArgumentException("Count should be > 0");
     }
 
+    // Новый метод для получения популярных фильмов с опциональными фильтрами по жанру и году
+    public List<FilmDto> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        if (count <= 0) {
+            throw new InvalidArgumentException("Count should be > 0");
+        }
+        // Если genreId и year равны null, используем старый метод для сохранения прежней функциональности
+        if (genreId == null && year == null) {
+            return getPopularFilms(count);
+        }
+        return storage.findPopular(count, genreId, year).stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
     public FilmDto getFilmById(Long id) {
         return storage.findById(id)
                 .map(FilmMapper::mapToFilmDto)

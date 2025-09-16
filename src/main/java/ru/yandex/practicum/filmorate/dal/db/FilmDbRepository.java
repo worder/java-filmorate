@@ -114,10 +114,6 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
         return this.findMany(FIND_ALL_QUERY);
     }
 
-    @Override
-    public List<Film> findPopular(int count) {
-        return this.findMany(FIND_POPULAR_QUERY, count);
-    }
 
     // Новый метод для получения списка популярных фильмов с фильтрами по жанру и году
     @Override

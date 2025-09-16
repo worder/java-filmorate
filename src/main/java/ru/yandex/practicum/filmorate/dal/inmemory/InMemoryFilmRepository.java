@@ -107,6 +107,13 @@ public class InMemoryFilmRepository implements FilmRepository {
         return fb.build();
     }
 
+    @Override
+    public void deleteById(Long id) {
+        storage.films.remove(id);
+        storage.filmGenres.remove(id);
+        storage.filmLikes.remove(id);
+    }
+
     private int getNextId() {
         return ++this.lastId;
     }

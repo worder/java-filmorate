@@ -38,6 +38,8 @@ public class UserDbRepository extends BaseDbRepository<User> implements UserRepo
             SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?
             """;
 
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
+
     public UserDbRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
     }
@@ -85,5 +87,10 @@ public class UserDbRepository extends BaseDbRepository<User> implements UserRepo
                 user.getId()
         );
         return user;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        this.update(DELETE_USER_QUERY, id);
     }
 }

@@ -71,6 +71,15 @@ public class InMemoryUserRepository implements UserRepository {
         return updatedUser;
     }
 
+    @Override
+    public void deleteById(Long id) {
+        storage.users.remove(id);
+        storage.userFriends.remove(id);
+        for (Set<Long> friends : storage.userFriends.values()) {
+            friends.remove(id);
+        }
+    }
+
     private long getNextId() {
         return ++this.lastId;
     }

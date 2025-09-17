@@ -40,6 +40,7 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
     private static final String UPDATE_FILM_QUERY = """
             UPDATE films
             SET name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?
+            WHERE id = ?
             """;
 
     private static final String FIND_POPULAR_QUERY = """
@@ -89,7 +90,8 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
                 film.getDescription(),
                 film.getReleaseDate().format(DateTimeFormatter.ISO_LOCAL_DATE),
                 film.getDuration(),
-                mpa != null ? mpa.getId() : null
+                mpa != null ? mpa.getId() : null,
+                film.getId()
         );
 
         Set<Genre> genres = film.getGenres();

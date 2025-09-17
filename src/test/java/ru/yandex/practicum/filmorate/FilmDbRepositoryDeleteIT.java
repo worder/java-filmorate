@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import ru.yandex.practicum.filmorate.dal.db.FilmDbRepository;
-import ru.yandex.practicum.filmorate.dal.db.mapper.FilmRowMapper;
+import ru.yandex.practicum.filmorate.dal.db.mapper.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 
 import java.sql.Date;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
-@Import({FilmDbRepository.class, FilmRowMapper.class})
+@Import({FilmDbRepository.class, FilmResultSetExtractor.class})
 class FilmDbRepositoryDeleteIT {
 
     private final FilmDbRepository filmRepo;

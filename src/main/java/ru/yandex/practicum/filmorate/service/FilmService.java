@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.InvalidArgumentException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
@@ -25,6 +26,7 @@ public class FilmService {
     private final FilmRepository storage;
     private final GenreService genreService;
     private final MpaService mpaService;
+    private final DirectorService directorService;
 
     public List<FilmDto> getAllFilms() {
         return storage.findAll().stream().map(FilmMapper::mapToFilmDto).toList();
@@ -40,7 +42,9 @@ public class FilmService {
     }
 
     public FilmDto getFilmById(Long id) {
-        return storage.findById(id).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Film not found"));
+        return storage.findById(id)
+                .map(FilmMapper::mapToFilmDto)
+                .orElseThrow(() -> new NotFoundException("Film not found"));
     }
 
     public FilmDto createFilm(NewFilmRequest request) {
@@ -48,6 +52,7 @@ public class FilmService {
 
         this.validateGenres(newFilm.getGenres());
         this.validateMpa(newFilm.getMpa());
+        this.validateDirectors(newFilm.getDirectors());
 
         newFilm = storage.save(newFilm);
         log.info("Created film: {} from data: {}", newFilm, request);
@@ -56,10 +61,13 @@ public class FilmService {
     }
 
     public FilmDto updateFilm(UpdateFilmRequest request) {
-        Film updatedFilm = storage.findById(request.getId()).map(f -> FilmMapper.updateFilmFields(f, request)).orElseThrow(() -> new InternalServerException("Failed to update film, film not found"));
+        Film updatedFilm = storage.findById(request.getId())
+                .map(f -> FilmMapper.updateFilmFields(f, request))
+                .orElseThrow(() -> new InternalServerException("Failed to update film, film not found"));
 
         this.validateGenres(updatedFilm.getGenres());
         this.validateMpa(updatedFilm.getMpa());
+        this.validateDirectors(updatedFilm.getDirectors());
 
         updatedFilm = storage.update(updatedFilm);
         log.info("Updated film: {} from data: {}", updatedFilm, request);
@@ -80,12 +88,14 @@ public class FilmService {
     }
 
     private void validateGenres(Set<Genre> genres) {
-        if (genres != null) {
-            for (Genre genre : genres) {
-                if (!genreService.isGenreExists(genre.getId())) {
-                    throw new NotFoundException("Failed to create film, genre not found");
-                }
-            }
+        if (genres != null && !genreService.isGenresExists(genres)) {
+            throw new NotFoundException("Failed to create film, genre not found");
+        }
+    }
+
+    private void validateDirectors(Set<Director> directors) {
+        if (directors != null && !directorService.isDirectorsExists(directors)) {
+            throw new NotFoundException("Failed to create film, director not found");
         }
     }
 

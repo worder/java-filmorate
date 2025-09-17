@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 public interface DirectorRepository {
     Collection<Director> findAll();
@@ -15,4 +16,6 @@ public interface DirectorRepository {
     Director update(Director director);
 
     void delete(Long id);
+
+    Collection<Director> findByIds(Set<Long> ids);
 }

@@ -2,9 +2,10 @@ package ru.yandex.practicum.filmorate.dal.db;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
@@ -17,17 +18,31 @@ import java.util.Set;
 
 @Primary
 @Repository("filmDbRepository")
-public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepository {
-    private static final String SELECT_FILM_WITH_MPA = "SELECT f.*, m.id AS mpa_id, m.name AS mpa_name ";
-    private static final String JOIN_MPA = "JOIN mpa_ratings m ON m.id=f.mpa_rating_id ";
+public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements FilmRepository {
 
-    private static final String FIND_ALL_QUERY = """
-            %s FROM films f %s
-            """.formatted(SELECT_FILM_WITH_MPA, JOIN_MPA);
+    // fetch all data with one request; %s can be film table name or subquery
+    private static final String SELECT_FILMS_TEMPLATE = """
+            SELECT f.*,
+            	m.id AS mpa_id,
+            	m.name AS mpa_name,
+            	g.id AS genre_id,
+            	g.name AS genre_name,
+            	d.id AS director_id,
+            	d.name AS director_name
+            FROM %s f
+            JOIN mpa_ratings m ON m.id = f.mpa_rating_id
+            LEFT JOIN film_genres fg ON fg.film_id = f.id
+            LEFT JOIN genres g ON g.id = fg.genre_id
+            LEFT JOIN film_directors fd ON fd.film_id = f.id
+            LEFT JOIN directors d ON d.id = fd.director_id
+            """;
+
+    private static final String FIND_ALL_QUERY = SELECT_FILMS_TEMPLATE.formatted("films");
 
     private static final String FIND_BY_ID_QUERY = """
-            %s FROM films f %s WHERE f.id = ?
-            """.formatted(SELECT_FILM_WITH_MPA, JOIN_MPA);
+            %s
+            WHERE f.id = ?
+            """.formatted(FIND_ALL_QUERY);
 
     private static final String INSERT_FILM_QUERY = """
             INSERT INTO films (name, description, release_date, duration, mpa_rating_id)
@@ -37,6 +52,10 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
     private static final String INSERT_FILM_GENRE_QUERY = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
 
     private static final String DELETE_FILM_GENRES_QUERY = "DELETE FROM film_genres WHERE film_id = ?";
+
+    private static final String INSERT_FILM_DIRECTOR_QUERY = "INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)";
+
+    private static final String DELETE_FILM_DIRECTORS_QUERY = "DELETE FROM film_directors WHERE film_id = ?";
 
     private static final String UPDATE_FILM_QUERY = """
             UPDATE films
@@ -48,8 +67,8 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
 
     private final JdbcTemplate db;
 
-    public FilmDbRepository(JdbcTemplate db, RowMapper<Film> mapper) {
-        super(db, mapper);
+    public FilmDbRepository(JdbcTemplate db, ResultSetExtractor<List<Film>> extractor) {
+        super(db, extractor);
         this.db = db;
     }
 
@@ -69,6 +88,13 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
         if (genres != null) {
             for (Genre g : genres) {
                 db.update(INSERT_FILM_GENRE_QUERY, newFilmId, g.getId());
+            }
+        }
+
+        Set<Director> directors = film.getDirectors();
+        if (directors != null) {
+            for (Director d : directors) {
+                db.update(INSERT_FILM_DIRECTOR_QUERY, newFilmId, d.getId());
             }
         }
 
@@ -95,6 +121,14 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
             }
         }
 
+        Set<Director> directors = film.getDirectors();
+        if (directors != null) {
+            db.update(DELETE_FILM_DIRECTORS_QUERY, film.getId());
+            for (Director d : directors) {
+                db.update(INSERT_FILM_DIRECTOR_QUERY, film.getId(), d.getId());
+            }
+        }
+
         return film;
     }
 
@@ -113,7 +147,7 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
     @Override
     public List<Film> findPopular(int count, Integer genreId, Integer year) {
         StringBuilder query = new StringBuilder(
-                String.format("%s, COUNT(fl.user_id) AS likes_count FROM films f %s", SELECT_FILM_WITH_MPA, JOIN_MPA)
+                "(SELECT f.*, COUNT(fl.user_id) AS likes_count FROM films f "
         );
 
         List<Object> params = new ArrayList<>();
@@ -141,10 +175,10 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
         query.append(whereClause);
         query.append(" GROUP BY f.id ");
         query.append(" ORDER BY likes_count DESC, f.id ASC");
-        query.append(" LIMIT ?");
+        query.append(" LIMIT ?)");
         params.add(count);
 
-        return this.findMany(query.toString(), params.toArray());
+        return this.findMany(SELECT_FILMS_TEMPLATE.formatted(query.toString()), params.toArray());
     }
 
     @Override

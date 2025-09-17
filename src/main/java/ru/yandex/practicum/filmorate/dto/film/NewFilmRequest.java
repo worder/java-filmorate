@@ -7,6 +7,7 @@ import lombok.ToString;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.annotation.FilmReleaseDate;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
@@ -32,6 +33,8 @@ public class NewFilmRequest {
     Integer duration;
 
     Set<Genre> genres;
+
+    Set<Director> directors;
 
     MpaRating mpa;
 }

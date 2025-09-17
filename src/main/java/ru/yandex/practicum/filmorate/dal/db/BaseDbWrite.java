@@ -1,32 +1,17 @@
 package ru.yandex.practicum.filmorate.dal.db;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Optional;
 
-@RequiredArgsConstructor
-public class BaseDbRepository<T> {
+public abstract class BaseDbWrite {
     private final JdbcTemplate db;
-    private final RowMapper<T> mapper;
 
-    protected Optional<T> findOne(String query, Object... params) {
-        try {
-            return Optional.ofNullable(db.queryForObject(query, mapper, params));
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    protected List<T> findMany(String query, Object... params) {
-        return db.query(query, mapper, params);
+    public BaseDbWrite(JdbcTemplate db) {
+        this.db = db;
     }
 
     protected void update(String query, Object... params) {

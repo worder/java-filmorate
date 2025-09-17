@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.mapper.DirectorMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -58,5 +60,13 @@ public class DirectorService {
 
     public boolean isExists(Long id) {
         return storage.findById(id).isPresent();
+    }
+
+    public boolean isDirectorsExists(Set<Director> directors) {
+        Set<Long> ids = directors.stream()
+                .map(Director::getId)
+                .collect(Collectors.toSet());
+
+        return storage.findByIds(ids).size() == ids.size();
     }
 }

@@ -2,20 +2,26 @@ package ru.yandex.practicum.filmorate.dal.db;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 @Repository("directorDbRepository")
-public class DirectorDbRepository extends BaseDbRepository<Director> implements DirectorRepository {
+public class DirectorDbRepository extends BaseDbRepositoryMapper<Director> implements DirectorRepository {
+
     private static final String FIND_ALL_QUERY = "SELECT * FROM directors";
 
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM directors WHERE id = ?";
+
+    private static final String FIND_BY_IDS_QUERY = "SELECT * FROM directors WHERE id IN (:ids)";
 
     private static final String INSERT_QUERY = "INSERT INTO directors (name) VALUES (?)";
 
@@ -49,5 +55,9 @@ public class DirectorDbRepository extends BaseDbRepository<Director> implements 
 
     public void delete(Long id) {
         this.update(DELETE_QUERY, id);
+    }
+
+    public Set<Director> findByIds(Set<Long> ids) {
+        return new HashSet<>(this.findMany(FIND_BY_IDS_QUERY, new MapSqlParameterSource("ids", ids)));
     }
 }

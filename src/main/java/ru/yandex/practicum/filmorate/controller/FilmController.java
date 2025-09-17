@@ -28,9 +28,12 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
 
+    // Обновленный метод для получения популярных фильмов с опциональными параметрами genreId и year
     @GetMapping("/popular")
-    public Collection<FilmDto> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
-        return filmService.getPopularFilms(count);
+    public Collection<FilmDto> getPopularFilms(@RequestParam(defaultValue = "10") Integer count,
+                                               @RequestParam(required = false) Integer genreId,
+                                               @RequestParam(required = false) Integer year) {
+        return filmService.getPopularFilms(count, genreId, year);
     }
 
     @PostMapping

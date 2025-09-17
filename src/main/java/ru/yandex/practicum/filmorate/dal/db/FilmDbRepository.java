@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -115,8 +116,42 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
         return this.findMany(FIND_ALL_QUERY);
     }
 
+
+    // Новый метод для получения списка популярных фильмов с фильтрами по жанру и году
     @Override
-    public List<Film> findPopular(int count) {
-        return this.findMany(FIND_POPULAR_QUERY, count);
+    public List<Film> findPopular(int count, Integer genreId, Integer year) {
+        StringBuilder query = new StringBuilder(
+                String.format("%s, COUNT(f.id) AS likes_count FROM films f %s", SELECT_FILM_WITH_MPA, JOIN_MPA)
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        StringBuilder whereClause = new StringBuilder();
+
+        if (genreId != null) {
+            query.append(" JOIN film_genres fg ON fg.film_id = f.id ");
+            whereClause.append("WHERE fg.genre_id = ? ");
+            params.add(genreId);
+        }
+
+        if (year != null) {
+            if (genreId != null) {
+                whereClause.append("AND ");
+            } else {
+                whereClause.append("WHERE ");
+            }
+            whereClause.append("EXTRACT(YEAR FROM f.release_date) = ? ");
+            params.add(year);
+        }
+
+        // Добавляем JOIN film_likes перед whereClause, чтобы он был в секции FROM/JOIN, а не после WHERE
+        query.append(" JOIN film_likes fl ON fl.film_id = f.id ");
+        query.append(whereClause);
+        query.append(" GROUP BY f.id ");
+        query.append(" ORDER BY likes_count DESC ");
+        query.append(" LIMIT ?");
+        params.add(count);
+
+        return this.findMany(query.toString(), params.toArray());
     }
 }

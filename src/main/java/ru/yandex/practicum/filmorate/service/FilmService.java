@@ -28,6 +28,11 @@ public class FilmService {
     private final MpaService mpaService;
     private final DirectorService directorService;
 
+    public enum FilmsSorting {
+        likes,
+        year
+    }
+
     public List<FilmDto> getAllFilms() {
         return storage.findAll().stream().map(FilmMapper::mapToFilmDto).toList();
     }
@@ -86,6 +91,16 @@ public class FilmService {
     public boolean filmExists(Long id) {
         return this.storage.findById(id).isPresent();
     }
+
+    public List<FilmDto> getFilmsByDirectorId(Long directorId, FilmsSorting sort) {
+        List<Film> films = switch (sort) {
+            case year -> storage.findFilmsByDirectorIdSortByYear(directorId);
+            case likes -> storage.findFilmsByDirectorIdSortByLikes(directorId);
+        };
+
+        return films.stream().map(FilmMapper::mapToFilmDto).toList();
+    }
+
 
     private void validateGenres(Set<Genre> genres) {
         if (genres != null && !genreService.isGenresExists(genres)) {

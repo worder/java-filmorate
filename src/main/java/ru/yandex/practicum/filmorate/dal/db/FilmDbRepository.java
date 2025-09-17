@@ -65,6 +65,24 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
 
     private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
 
+    private static final String FIND_DIRECTOR_FILMS_SORT_BY_DATE_SUBQUERY = """
+            (SELECT f.*
+            FROM films f
+            JOIN film_directors fd ON fd.film_id=f.id
+            WHERE fd.director_id = ?
+            ORDER BY EXTRACT(YEAR FROM release_date))
+            """;
+
+    private static final String FIND_DIRECTOR_FILMS_SORT_BY_LIKES_SUBQUERY = """
+            (SELECT f.*, count(fl.film_id) AS likes_count
+            FROM films f
+            JOIN film_directors fd ON fd.film_id=f.id
+            LEFT JOIN film_likes fl ON fl.film_id=f.id
+            WHERE fd.director_id = ?
+            GROUP BY f.id
+            ORDER BY likes_count DESC)
+            """;
+
     private final JdbcTemplate db;
 
     public FilmDbRepository(JdbcTemplate db, ResultSetExtractor<List<Film>> extractor) {
@@ -86,16 +104,12 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
 
         Set<Genre> genres = film.getGenres();
         if (genres != null) {
-            for (Genre g : genres) {
-                db.update(INSERT_FILM_GENRE_QUERY, newFilmId, g.getId());
-            }
+            genres.forEach(g -> db.update(INSERT_FILM_GENRE_QUERY, newFilmId, g.getId()));
         }
 
         Set<Director> directors = film.getDirectors();
         if (directors != null) {
-            for (Director d : directors) {
-                db.update(INSERT_FILM_DIRECTOR_QUERY, newFilmId, d.getId());
-            }
+            directors.forEach(d -> db.update(INSERT_FILM_DIRECTOR_QUERY, newFilmId, d.getId()));
         }
 
         return film.toBuilder().id(newFilmId).build();
@@ -116,17 +130,13 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
         Set<Genre> genres = film.getGenres();
         if (genres != null) {
             db.update(DELETE_FILM_GENRES_QUERY, film.getId());
-            for (Genre g : genres) {
-                db.update(INSERT_FILM_GENRE_QUERY, film.getId(), g.getId());
-            }
+            genres.forEach(g -> db.update(INSERT_FILM_GENRE_QUERY, film.getId(), g.getId()));
         }
 
         Set<Director> directors = film.getDirectors();
         if (directors != null) {
             db.update(DELETE_FILM_DIRECTORS_QUERY, film.getId());
-            for (Director d : directors) {
-                db.update(INSERT_FILM_DIRECTOR_QUERY, film.getId(), d.getId());
-            }
+            directors.forEach(d -> db.update(INSERT_FILM_DIRECTOR_QUERY, film.getId(), d.getId()));
         }
 
         return film;
@@ -179,6 +189,18 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
         params.add(count);
 
         return this.findMany(SELECT_FILMS_TEMPLATE.formatted(query.toString()), params.toArray());
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorIdSortByYear(Long directorId) {
+        return this.findMany(SELECT_FILMS_TEMPLATE
+                .formatted(FIND_DIRECTOR_FILMS_SORT_BY_DATE_SUBQUERY), directorId);
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorIdSortByLikes(Long directorId) {
+        return this.findMany(SELECT_FILMS_TEMPLATE
+                .formatted(FIND_DIRECTOR_FILMS_SORT_BY_LIKES_SUBQUERY), directorId);
     }
 
     @Override

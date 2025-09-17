@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS user_friends (
-  user_id bigint REFERENCES users,
-  friend_id bigint REFERENCES users,
+  user_id bigint REFERENCES users ON DELETE CASCADE,
+  friend_id bigint REFERENCES users ON DELETE CASCADE,
   is_accepted bool NOT NULL DEFAULT false,
   PRIMARY KEY (user_id, friend_id)
 );
@@ -33,13 +33,13 @@ CREATE TABLE IF NOT EXISTS genres (
 );
 
 CREATE TABLE IF NOT EXISTS film_genres (
-  film_id bigint REFERENCES films,
+  film_id bigint REFERENCES films ON DELETE CASCADE,
   genre_id integer REFERENCES genres,
   PRIMARY KEY (film_id, genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS film_likes (
-  user_id bigint REFERENCES users,
-  film_id bigint REFERENCES films,
+  user_id bigint REFERENCES users ON DELETE CASCADE,
+  film_id bigint REFERENCES films ON DELETE CASCADE,
   PRIMARY KEY (user_id, film_id)
 );

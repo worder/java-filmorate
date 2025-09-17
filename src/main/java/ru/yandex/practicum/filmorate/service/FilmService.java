@@ -67,6 +67,14 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(updatedFilm);
     }
 
+    public void deleteFilm(Long id) {
+        if (!filmExists(id)) {
+            throw new NotFoundException("Film deletion failed, film not found");
+        }
+        storage.deleteById(id);
+        log.info("Deleted film id={}", id);
+    }
+
     public boolean filmExists(Long id) {
         return this.storage.findById(id).isPresent();
     }

@@ -44,15 +44,7 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
             WHERE id = ?
             """;
 
-    private static final String FIND_POPULAR_QUERY = """
-            %s, count(f.id) AS likes_count
-            FROM films f
-            %s
-            JOIN film_likes fl ON f.id=fl.film_id
-            GROUP BY f.id
-            ORDER BY likes_count DESC
-            LIMIT ?
-            """.formatted(SELECT_FILM_WITH_MPA, JOIN_MPA);
+    private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
 
     private final JdbcTemplate db;
 
@@ -121,7 +113,7 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
     @Override
     public List<Film> findPopular(int count, Integer genreId, Integer year) {
         StringBuilder query = new StringBuilder(
-                String.format("%s, COUNT(f.id) AS likes_count FROM films f %s", SELECT_FILM_WITH_MPA, JOIN_MPA)
+                String.format("%s, COUNT(fl.user_id) AS likes_count FROM films f %s", SELECT_FILM_WITH_MPA, JOIN_MPA)
         );
 
         List<Object> params = new ArrayList<>();
@@ -144,14 +136,19 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
             params.add(year);
         }
 
-        // Добавляем JOIN film_likes перед whereClause, чтобы он был в секции FROM/JOIN, а не после WHERE
-        query.append(" JOIN film_likes fl ON fl.film_id = f.id ");
+        // Добавляем LEFT JOIN film_likes перед whereClause, чтобы он был в секции FROM/JOIN, а не после WHERE
+        query.append("LEFT JOIN film_likes fl ON fl.film_id = f.id ");
         query.append(whereClause);
         query.append(" GROUP BY f.id ");
-        query.append(" ORDER BY likes_count DESC ");
+        query.append(" ORDER BY likes_count DESC, f.id ASC");
         query.append(" LIMIT ?");
         params.add(count);
 
         return this.findMany(query.toString(), params.toArray());
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        this.update(DELETE_FILM_QUERY, id);
     }
 }

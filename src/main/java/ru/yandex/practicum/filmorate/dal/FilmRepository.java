@@ -18,4 +18,6 @@ public interface FilmRepository {
     Film save(Film film);
 
     Film update(Film film);
+
+    void deleteById(Long id);
 }

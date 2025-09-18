@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
 
-import java.time.Instant;
-
 @Value
 @Builder(toBuilder = true)
 @ToString
@@ -27,7 +25,7 @@ public class FeedEvent {
     Long entityId;
     EventType eventType;
     EventOperation operation;
-    Instant timestamp;
+    Long timestamp;
 
     public static FeedEvent addLike(Long userId, Long filmId) {
         return FeedEvent.builder()
@@ -80,6 +78,15 @@ public class FeedEvent {
                 .entityId(filmId)
                 .eventType(EventType.REVIEW)
                 .operation(EventOperation.REMOVE)
+                .build();
+    }
+
+    public static FeedEvent updateReview(Long userId, Long filmId) {
+        return FeedEvent.builder()
+                .userId(userId)
+                .entityId(filmId)
+                .eventType(EventType.REVIEW)
+                .operation(EventOperation.UPDATE)
                 .build();
     }
 }

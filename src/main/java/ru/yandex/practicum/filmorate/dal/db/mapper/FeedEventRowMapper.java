@@ -17,7 +17,7 @@ public class FeedEventRowMapper implements RowMapper<FeedEvent> {
                 .entityId(rs.getLong("entity_id"))
                 .eventType(FeedEvent.EventType.valueOf(rs.getString("event_type")))
                 .operation(FeedEvent.EventOperation.valueOf(rs.getString("operation")))
-                .timestamp(rs.getTimestamp("time_stamp").toInstant())
+                .timestamp(rs.getLong("time_stamp"))
                 .build();
     }
 }

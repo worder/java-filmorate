@@ -19,7 +19,12 @@ public class FeedEventDbRepository extends BaseDbRepositoryMapper<FeedEvent> imp
             VALUES (?, ?, ?, ?, ?)
             """;
 
-    private static final String FIND_USER_FEED_QUERY = "SELECT * FROM feed_events WHERE user_id = ?";
+    private static final String FIND_USER_FEED_QUERY = """
+            SELECT *
+            FROM feed_events
+            WHERE user_id = ?
+            ORDER BY event_id
+            """;
 
     FeedEventDbRepository(JdbcTemplate db, RowMapper<FeedEvent> mapper) {
         super(db, mapper);
@@ -27,7 +32,7 @@ public class FeedEventDbRepository extends BaseDbRepositoryMapper<FeedEvent> imp
 
     @Override
     public FeedEvent save(FeedEvent event) {
-        FeedEvent newEvent = event.toBuilder().timestamp(Instant.now()).build();
+        FeedEvent newEvent = event.toBuilder().timestamp(Instant.now().toEpochMilli()).build();
         Long id = this.insert(INSERT_EVENT_QUERY,
                 newEvent.getUserId(),
                 newEvent.getEntityId(),

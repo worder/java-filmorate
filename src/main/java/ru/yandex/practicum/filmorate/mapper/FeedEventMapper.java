@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.FeedEvent;
 public class FeedEventMapper {
     public static FeedEventDto mapToFeedEventDto(FeedEvent event) {
         return FeedEventDto.builder()
-                .timestamp(event.getTimestamp().getEpochSecond())
+                .timestamp(event.getTimestamp())
                 .userId(event.getUserId())
                 .eventType(event.getEventType().toString())
                 .operation(event.getOperation().toString())

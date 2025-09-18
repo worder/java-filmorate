@@ -72,19 +72,19 @@ public class FeedEvent {
                 .build();
     }
 
-    public static FeedEvent removeReview(Long userId, Long filmId) {
+    public static FeedEvent removeReview(Long userId, Long reviewId) {
         return FeedEvent.builder()
                 .userId(userId)
-                .entityId(filmId)
+                .entityId(reviewId)
                 .eventType(EventType.REVIEW)
                 .operation(EventOperation.REMOVE)
                 .build();
     }
 
-    public static FeedEvent updateReview(Long userId, Long filmId) {
+    public static FeedEvent updateReview(Long userId, Long reviewId) {
         return FeedEvent.builder()
                 .userId(userId)
-                .entityId(filmId)
+                .entityId(reviewId)
                 .eventType(EventType.REVIEW)
                 .operation(EventOperation.UPDATE)
                 .build();

@@ -60,7 +60,7 @@ public class ReviewService {
 
         newReview = storage.save(newReview);
         log.info("Created review: {} from data: {}", newReview, request);
-        feedService.addEvent(FeedEvent.addReview(newReview.getUserId(), newReview.getFilmId()));
+        feedService.addEvent(FeedEvent.addReview(newReview.getUserId(), newReview.getId()));
 
         return ReviewMapper.mapToReviewDto(newReview);
     }
@@ -84,7 +84,7 @@ public class ReviewService {
 
         storage.update(review);
         log.info("Updated review: {} from data: {}", review, request);
-        feedService.addEvent(FeedEvent.updateReview(review.getUserId(), review.getFilmId()));
+        feedService.addEvent(FeedEvent.updateReview(review.getUserId(), review.getId()));
 
         return ReviewMapper.mapToReviewDto(review);
     }
@@ -96,7 +96,7 @@ public class ReviewService {
 
         storage.deleteById(id);
         log.info("Deleted review: {} from data: {}", id, this);
-        feedService.addEvent(FeedEvent.removeReview(review.getUserId(), review.getFilmId()));
+        feedService.addEvent(FeedEvent.removeReview(review.getUserId(), review.getId()));
     }
 
 

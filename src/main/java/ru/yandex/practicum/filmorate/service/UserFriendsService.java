@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 
 import java.util.Collection;
 
@@ -18,11 +19,13 @@ public class UserFriendsService {
     private final UserFriendsRepository friendsStorage;
     private final UserRepository userStorage;
     private final UserService userService;
+    private final FeedService feedService;
 
     public void addFriend(Long userId, Long friendId) {
         if (userService.userExists(userId) && userService.userExists(friendId)) {
             log.info("User: {} added friend: {}", userId, friendId);
             friendsStorage.addFriend(userId, friendId);
+            feedService.addEvent(FeedEvent.addFriend(userId, friendId));
         } else {
             throw new NotFoundException("User not found");
         }
@@ -32,6 +35,7 @@ public class UserFriendsService {
         if (userService.userExists(userId) && userService.userExists(friendId)) {
             log.info("User: {} removed friend: {}", userId, friendId);
             friendsStorage.removeFriend(userId, friendId);
+            feedService.addEvent(FeedEvent.removeFriend(userId, friendId));
         } else {
             throw new NotFoundException("User not found");
         }

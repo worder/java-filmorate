@@ -28,25 +28,20 @@ public class FilmService {
     private final UserService userService;
 
     public List<FilmDto> getAllFilms() {
-        return storage.findAll().stream()
-                .map(FilmMapper::mapToFilmDto)
-                .toList();
+        return storage.findAll().stream().map(FilmMapper::mapToFilmDto).toList();
     }
 
-    public List<FilmDto> getPopularFilms(Integer count) {
-        if (count > 0) {
-            return storage.findPopular(count).stream()
-                    .map(FilmMapper::mapToFilmDto)
-                    .toList();
+    // Новый метод для получения популярных фильмов с опциональными фильтрами по жанру и году
+    public List<FilmDto> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        if (count <= 0) {
+            throw new InvalidArgumentException("Count should be > 0");
         }
 
-        throw new InvalidArgumentException("Count should be > 0");
+        return storage.findPopular(count, genreId, year).stream().map(FilmMapper::mapToFilmDto).toList();
     }
 
     public FilmDto getFilmById(Long id) {
-        return storage.findById(id)
-                .map(FilmMapper::mapToFilmDto)
-                .orElseThrow(() -> new NotFoundException("Film not found"));
+        return storage.findById(id).map(FilmMapper::mapToFilmDto).orElseThrow(() -> new NotFoundException("Film not found"));
     }
 
     public FilmDto createFilm(NewFilmRequest request) {
@@ -62,9 +57,7 @@ public class FilmService {
     }
 
     public FilmDto updateFilm(UpdateFilmRequest request) {
-        Film updatedFilm = storage.findById(request.getId())
-                .map(f -> FilmMapper.updateFilmFields(f, request))
-                .orElseThrow(() -> new InternalServerException("Failed to update film, film not found"));
+        Film updatedFilm = storage.findById(request.getId()).map(f -> FilmMapper.updateFilmFields(f, request)).orElseThrow(() -> new InternalServerException("Failed to update film, film not found"));
 
         this.validateGenres(updatedFilm.getGenres());
         this.validateMpa(updatedFilm.getMpa());
@@ -73,6 +66,14 @@ public class FilmService {
         log.info("Updated film: {} from data: {}", updatedFilm, request);
 
         return FilmMapper.mapToFilmDto(updatedFilm);
+    }
+
+    public void deleteFilm(Long id) {
+        if (!filmExists(id)) {
+            throw new NotFoundException("Film deletion failed, film not found");
+        }
+        storage.deleteById(id);
+        log.info("Deleted film id={}", id);
     }
 
     public boolean filmExists(Long id) {

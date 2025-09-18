@@ -56,6 +56,16 @@ public class UserController {
         return friendService.getCommonFriends(id, otherId);
     }
 
+    @GetMapping("/{userId}")
+    public UserDto findById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+
     // Эндпоинт для получения рекомендаций фильмов для пользователя
     @GetMapping("/{id}/recommendations")
     public Collection<FilmDto> getRecommendations(@PathVariable Long id) {

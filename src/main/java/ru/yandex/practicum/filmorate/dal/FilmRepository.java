@@ -9,7 +9,9 @@ import java.util.Optional;
 public interface FilmRepository {
     Collection<Film> findAll();
 
-    Collection<Film> findPopular(int count);
+
+    // Новый метод для поиска популярных фильмов с фильтрами по жанру и году
+    List<Film> findPopular(int count, Integer genreId, Integer year);
 
     Optional<Film> findById(Long id);
 
@@ -18,4 +20,7 @@ public interface FilmRepository {
     Film update(Film film);
 
     List<Film> findRecommendations(long userId);
+
+
+    void deleteById(Long id);
 }

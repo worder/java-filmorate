@@ -51,6 +51,14 @@ public class UserService {
         return UserMapper.mapToUserDto(user);
     }
 
+    public void deleteUser(Long id) {
+        if (!userExists(id)) {
+            throw new NotFoundException("User deletion failed, user not found");
+        }
+        storage.deleteById(id);
+        log.info("Deleted user id={}", id);
+    }
+
     public boolean userExists(Long userId) {
         return storage.findById(userId).isPresent();
     }

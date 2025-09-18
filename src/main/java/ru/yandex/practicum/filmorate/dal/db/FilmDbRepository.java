@@ -244,7 +244,7 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
     }
 
     @Override
-    public List<Film> findCommonFilms(Long userId, Long friendId){
+    public List<Film> findCommonFilms(Long userId, Long friendId) {
         return this.findMany(FIND_COMMON_FILMS, userId, friendId);
     }
 }

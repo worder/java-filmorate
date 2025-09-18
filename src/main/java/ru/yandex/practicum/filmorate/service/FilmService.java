@@ -16,8 +16,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -82,6 +84,26 @@ public class FilmService {
         }
         storage.deleteById(id);
         log.info("Deleted film id={}", id);
+    }
+
+    public List<FilmDto> search(String query, String byParam) {
+        Set<String> by = Arrays.stream(byParam == null ? new String[]{"title"} : byParam.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        for (String b : by) {
+            if (!b.equals("title") && !b.equals("director")) {
+                throw new IllegalArgumentException("Invalid parameter value: " + b + ". Use 'title', 'director' or both.");
+            }
+        }
+
+        List<Film> films = storage.search(query, by);
+
+        return films.stream()
+                .map(FilmMapper::mapToFilmDto)
+                .collect(Collectors.toList());
     }
 
     public boolean filmExists(Long id) {

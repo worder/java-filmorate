@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface FilmRepository {
     List<Film> findAll();
@@ -25,6 +26,8 @@ public interface FilmRepository {
     List<Film> findFilmsByDirectorIdSortByYear(Long directorId);
 
     List<Film> findFilmsByDirectorIdSortByLikes(Long directorId);
+
+    List<Film> search(String query, Set<String> by);
 
     List<Film> findCommonFilms(Long userId, Long friendId);
 }

@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
-import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.InvalidArgumentException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
@@ -69,7 +68,7 @@ public class FilmService {
     public FilmDto updateFilm(UpdateFilmRequest request) {
         Film updatedFilm = storage.findById(request.getId())
                 .map(f -> FilmMapper.updateFilmFields(f, request))
-                .orElseThrow(() -> new InternalServerException("Failed to update film, film not found"));
+                .orElseThrow(() -> new NotFoundException("Failed to update film, film not found"));
 
         this.validateGenres(updatedFilm.getGenres());
         this.validateMpa(updatedFilm.getMpa());

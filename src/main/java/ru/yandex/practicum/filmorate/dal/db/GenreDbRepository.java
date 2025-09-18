@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal.db;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.GenreRepository;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -14,14 +15,13 @@ import java.util.Set;
 
 @Primary
 @Repository("genreDbRepository")
-public class GenreDbRepository extends BaseDbRepository<Genre> implements GenreRepository {
+public class GenreDbRepository extends BaseDbRepositoryMapper<Genre> implements GenreRepository {
     private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM genres WHERE id = ?";
-    private static final String FIND_BY_FILM_ID_QUERY = """
-            SELECT g.id, g.name
-            FROM film_genres fg
-            JOIN genres g ON g.id=fg.genre_id
-            WHERE fg.film_id = ?
+    private static final String FIND_BY_IDS = """
+            SELECT id, name
+            FROM genres
+            WHERE id IN (:ids)
             """;
 
     public GenreDbRepository(JdbcTemplate db, RowMapper<Genre> mapper) {
@@ -39,7 +39,7 @@ public class GenreDbRepository extends BaseDbRepository<Genre> implements GenreR
     }
 
     @Override
-    public Set<Genre> findByFilmId(Long id) {
-        return new HashSet<>(this.findMany(FIND_BY_FILM_ID_QUERY, id));
+    public Set<Genre> findByIds(Set<Integer> ids) {
+        return new HashSet<>(this.findMany(FIND_BY_IDS, new MapSqlParameterSource("ids", ids)));
     }
 }

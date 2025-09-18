@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Primary
 @Repository("userDbRepository")
-public class UserDbRepository extends BaseDbRepository<User> implements UserRepository {
+public class UserDbRepository extends BaseDbRepositoryMapper<User> implements UserRepository {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
 
     private static final String FIND_USER_FRIENDS_QUERY = """

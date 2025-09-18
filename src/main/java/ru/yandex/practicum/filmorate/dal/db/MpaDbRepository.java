@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Primary
 @Repository("mpaDbRepository")
-public class MpaDbRepository extends BaseDbRepository<MpaRating> implements MpaRepository {
+public class MpaDbRepository extends BaseDbRepositoryMapper<MpaRating> implements MpaRepository {
     private static final String FIND_ALL_QUERY = "SELECT * FROM mpa_ratings";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM mpa_ratings WHERE id = ?";
 

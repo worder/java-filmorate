@@ -19,7 +19,7 @@ public class InMemoryFilmRepository implements FilmRepository {
     private int lastId = 0;
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return new ArrayList<>(storage.films.values().stream()
                 .map(this::buildFilm)
                 .toList()
@@ -117,6 +117,16 @@ public class InMemoryFilmRepository implements FilmRepository {
         storage.films.remove(id);
         storage.filmGenres.remove(id);
         storage.filmLikes.remove(id);
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorIdSortByLikes(Long directorId) {
+        return List.of();
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorIdSortByYear(Long directorId) {
+        return List.of();
     }
 
     private int getNextId() {

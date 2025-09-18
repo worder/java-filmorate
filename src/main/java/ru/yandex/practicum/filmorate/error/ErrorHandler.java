@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -28,6 +29,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationError(final MethodArgumentNotValidException e) {
         return new ErrorResponse("Bad request", "Invalid request content");
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMissingRequestParameterError(final MissingServletRequestParameterException e) {
+        return new ErrorResponse("Bad request", "Missing required request parameter");
     }
 
     @ExceptionHandler

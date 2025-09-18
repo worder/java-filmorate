@@ -62,6 +62,11 @@ public class InMemoryFilmRepository implements FilmRepository {
         return this.buildFilm(updatedFilm);
     }
 
+    @Override
+    public List<Film> findRecommendations(long userId) {
+        return List.of();
+    }
+
 
     public List<Film> findPopular(int count) {
         return storage.filmLikes.entrySet().stream()

@@ -83,6 +83,18 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
             ORDER BY likes_count DESC)
             """;
 
+    private static final String FIND_RECOMMENDED_FILMS_SUBQUERY = """
+            (SELECT f.*, COUNT(DISTINCT fl2.user_id) as score
+            FROM film_likes fl1
+            JOIN film_likes fl2 ON fl1.user_id = fl2.user_id
+            JOIN films f ON fl2.film_id = f.id
+            WHERE fl1.user_id != ?
+              AND fl1.film_id IN (SELECT film_id FROM film_likes WHERE user_id = ?)
+              AND fl2.film_id NOT IN (SELECT film_id FROM film_likes WHERE user_id = ?)
+            GROUP BY fl2.film_id
+            ORDER BY score DESC)
+            """;
+
     private final JdbcTemplate db;
 
     public FilmDbRepository(JdbcTemplate db, ResultSetExtractor<List<Film>> extractor) {
@@ -140,6 +152,11 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
         }
 
         return film;
+    }
+
+    @Override
+    public List<Film> findRecommendations(long userId) {
+        return this.findMany(SELECT_FILMS_TEMPLATE.formatted(FIND_RECOMMENDED_FILMS_SUBQUERY), userId, userId, userId);
     }
 
     @Override

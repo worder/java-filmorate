@@ -49,7 +49,7 @@ public class ReviewLikesDbRepository extends BaseDbRepositoryMapper<ReviewLikes>
 
     @Override
     public void save(ReviewLikes reviewLikes) {
-        this.insertWithoutId(
+        this.update(
                 MERGE_REVIEW_LIKES_QUERY,
                 reviewLikes.getReviewId(),
                 reviewLikes.getUserId(),

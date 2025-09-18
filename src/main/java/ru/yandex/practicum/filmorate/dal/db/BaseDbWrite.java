@@ -38,15 +38,4 @@ public abstract class BaseDbWrite {
             throw new InternalServerException("Failed to create entity");
         }
     }
-
-    protected void insertWithoutId(String query, Object... params) {
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        db.update(con -> {
-            PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            for (int i = 0; i < params.length; i++) {
-                ps.setObject(i + 1, params[i]);
-            }
-            return ps;
-        }, keyHolder);
-    }
 }

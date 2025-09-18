@@ -11,5 +11,5 @@ public interface GenreRepository {
 
     Optional<Genre> findById(Integer id);
 
-    Set<Genre> findByFilmId(Long id);
+    Collection<Genre> findByIds(Set<Integer> ids);
 }

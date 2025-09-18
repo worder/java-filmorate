@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Repository("inMemoryGenreRepository")
 @RequiredArgsConstructor
@@ -39,14 +38,7 @@ public class InMemoryGenreRepository implements GenreRepository {
     }
 
     @Override
-    public Set<Genre> findByFilmId(Long id) {
-        if (storage.filmGenres.containsKey(id)) {
-            return storage.filmGenres.get(id).stream()
-                    .map(this::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toSet());
-        }
+    public Set<Genre> findByIds(Set<Integer> ids) {
         return new HashSet<>();
     }
 

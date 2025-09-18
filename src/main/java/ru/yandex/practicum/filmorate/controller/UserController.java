@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserFriendsService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -17,6 +19,7 @@ import java.util.Collection;
 public class UserController {
     private final UserService userService;
     private final UserFriendsService friendService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<UserDto> getAll() {
@@ -51,5 +54,21 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<UserDto> getFriendsCommon(@PathVariable Long id, @PathVariable Long otherId) {
         return friendService.getCommonFriends(id, otherId);
+    }
+
+    @GetMapping("/{userId}")
+    public UserDto findById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+
+    // Эндпоинт для получения рекомендаций фильмов для пользователя
+    @GetMapping("/{id}/recommendations")
+    public Collection<FilmDto> getRecommendations(@PathVariable Long id) {
+        return filmService.getRecommendations(id);
     }
 }

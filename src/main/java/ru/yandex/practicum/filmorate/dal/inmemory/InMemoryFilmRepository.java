@@ -19,7 +19,7 @@ public class InMemoryFilmRepository implements FilmRepository {
     private int lastId = 0;
 
     @Override
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return new ArrayList<>(storage.films.values().stream()
                 .map(this::buildFilm)
                 .toList()
@@ -63,7 +63,12 @@ public class InMemoryFilmRepository implements FilmRepository {
     }
 
     @Override
-    public Collection<Film> findPopular(int count) {
+    public List<Film> findRecommendations(long userId) {
+        return List.of();
+    }
+
+
+    public List<Film> findPopular(int count) {
         return storage.filmLikes.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().size() - e1.getValue().size())
                 .map(Map.Entry::getKey)
@@ -73,6 +78,11 @@ public class InMemoryFilmRepository implements FilmRepository {
                 .map(this::buildFilm)
                 .limit(count)
                 .toList();
+    }
+
+    @Override
+    public List<Film> findPopular(int count, Integer genreId, Integer year) {
+        return List.of();
     }
 
     private Film buildFilm(Film filmFromStorage) {
@@ -100,6 +110,23 @@ public class InMemoryFilmRepository implements FilmRepository {
         }
 
         return fb.build();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        storage.films.remove(id);
+        storage.filmGenres.remove(id);
+        storage.filmLikes.remove(id);
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorIdSortByLikes(Long directorId) {
+        return List.of();
+    }
+
+    @Override
+    public List<Film> findFilmsByDirectorIdSortByYear(Long directorId) {
+        return List.of();
     }
 
     private int getNextId() {

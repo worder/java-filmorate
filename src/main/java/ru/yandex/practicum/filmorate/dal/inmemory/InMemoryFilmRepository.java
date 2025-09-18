@@ -132,4 +132,9 @@ public class InMemoryFilmRepository implements FilmRepository {
     private int getNextId() {
         return ++this.lastId;
     }
+
+    @Override
+    public List<Film> findCommonFilms(Long userId, Long friendId) {
+        return List.of();
+    }
 }

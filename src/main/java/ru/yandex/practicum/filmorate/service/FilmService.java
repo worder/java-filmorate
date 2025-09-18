@@ -29,11 +29,6 @@ public class FilmService {
     private final UserService userService;
     private final DirectorService directorService;
 
-    public enum FilmsSorting {
-        likes,
-        year
-    }
-
     public List<FilmDto> getAllFilms() {
         return storage.findAll().stream().map(FilmMapper::mapToFilmDto).toList();
     }
@@ -102,7 +97,6 @@ public class FilmService {
         return films.stream().map(FilmMapper::mapToFilmDto).toList();
     }
 
-
     private void validateGenres(Set<Genre> genres) {
         if (genres != null && !genreService.isGenresExists(genres)) {
             throw new NotFoundException("Failed to create film, genre not found");
@@ -128,5 +122,17 @@ public class FilmService {
         return storage.findRecommendations(userId).stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
+    }
+
+    public List<FilmDto> getCommonFilms(Long userId, Long friendId) {
+        return storage.findCommonFilms(userId, friendId).stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
+
+    public enum FilmsSorting {
+        likes,
+        year
     }
 }

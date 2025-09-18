@@ -95,6 +95,24 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
             ORDER BY score DESC)
             """;
 
+    private static final String FIND_COMMON_FILMS = SELECT_FILMS_TEMPLATE.formatted("""
+            (SELECT f.id,
+                   f.name,
+                   f.description,
+                   f.release_date,
+                   f.duration,
+                   f.mpa_rating_id,
+                   COUNT(flall.user_id) as total_reviews
+            FROM films f
+                     JOIN film_likes fl1 ON fl1.film_id = f.id
+                     JOIN film_likes fl2 ON fl2.film_id = f.id
+                     JOIN film_likes flall ON f.id = flall.film_id
+            WHERE fl1.user_id = ?
+              AND fl2.user_id = ?
+            GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.mpa_rating_id
+            ORDER BY total_reviews DESC)
+            """);
+
     private final JdbcTemplate db;
 
     public FilmDbRepository(JdbcTemplate db, ResultSetExtractor<List<Film>> extractor) {
@@ -223,5 +241,10 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
     @Override
     public void deleteById(Long id) {
         this.update(DELETE_FILM_QUERY, id);
+    }
+
+    @Override
+    public List<Film> findCommonFilms(Long userId, Long friendId){
+        return this.findMany(FIND_COMMON_FILMS, userId, friendId);
     }
 }

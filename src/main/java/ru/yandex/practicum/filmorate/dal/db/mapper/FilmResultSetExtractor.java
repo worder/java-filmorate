@@ -23,16 +23,21 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
         while (rs.next()) {
             Long id = rs.getLong("id");
             if (!filmsById.containsKey(id)) {
+                MpaRating mpa = null;
+                if (rs.getString("mpa_name") != null) {
+                    mpa = MpaRating.builder()
+                            .id(rs.getInt("mpa_id"))
+                            .name(rs.getString("mpa_name"))
+                            .build();
+                }
+
                 Film film = Film.builder()
                         .id(id)
                         .name(rs.getString("name"))
                         .description(rs.getString("description"))
                         .releaseDate(rs.getDate("release_date").toLocalDate())
                         .duration(rs.getInt("duration"))
-                        .mpa(MpaRating.builder()
-                                .id(rs.getInt("mpa_id"))
-                                .name(rs.getString("mpa_name"))
-                                .build())
+                        .mpa(mpa)
                         .genres(new LinkedHashSet<>())
                         .directors(new LinkedHashSet<>())
                         .build();

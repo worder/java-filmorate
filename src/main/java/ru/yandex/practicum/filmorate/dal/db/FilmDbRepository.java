@@ -30,7 +30,7 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
             	d.id AS director_id,
             	d.name AS director_name
             FROM %s f
-            JOIN mpa_ratings m ON m.id = f.mpa_rating_id
+            LEFT JOIN mpa_ratings m ON m.id = f.mpa_rating_id
             LEFT JOIN film_genres fg ON fg.film_id = f.id
             LEFT JOIN genres g ON g.id = fg.genre_id
             LEFT JOIN film_directors fd ON fd.film_id = f.id

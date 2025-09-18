@@ -19,5 +19,8 @@ public interface FilmRepository {
 
     Film update(Film film);
 
+    List<Film> findRecommendations(long userId);
+
+
     void deleteById(Long id);
 }

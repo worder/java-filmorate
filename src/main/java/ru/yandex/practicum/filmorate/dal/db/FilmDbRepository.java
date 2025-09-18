@@ -45,6 +45,19 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
 
     private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
 
+    private static final String GET_RECOMMENDED_FILMS_QUERY = """
+            SELECT f.*, m.id AS mpa_id, m.name AS mpa_name, COUNT(DISTINCT fl2.user_id) as score
+            FROM film_likes fl1
+            JOIN film_likes fl2 ON fl1.user_id = fl2.user_id
+            JOIN films f ON fl2.film_id = f.id
+            JOIN mpa_ratings m ON f.mpa_rating_id = m.id
+            WHERE fl1.user_id != ?
+              AND fl1.film_id IN (SELECT film_id FROM film_likes WHERE user_id = ?)
+              AND fl2.film_id NOT IN (SELECT film_id FROM film_likes WHERE user_id = ?)
+            GROUP BY fl2.film_id
+            ORDER BY score DESC
+            """;
+
     private final JdbcTemplate db;
 
     public FilmDbRepository(JdbcTemplate db, RowMapper<Film> mapper) {
@@ -94,6 +107,11 @@ public class FilmDbRepository extends BaseDbRepository<Film> implements FilmRepo
         }
 
         return film;
+    }
+
+    @Override
+    public List<Film> findRecommendations(long userId) {
+        return this.findMany(GET_RECOMMENDED_FILMS_QUERY, userId, userId, userId);
     }
 
     @Override

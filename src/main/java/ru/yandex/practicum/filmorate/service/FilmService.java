@@ -25,6 +25,7 @@ public class FilmService {
     private final FilmRepository storage;
     private final GenreService genreService;
     private final MpaService mpaService;
+    private final UserService userService;
 
     public List<FilmDto> getAllFilms() {
         return storage.findAll().stream().map(FilmMapper::mapToFilmDto).toList();
@@ -93,5 +94,14 @@ public class FilmService {
         if (mpa != null && !mpaService.isMpaExists(mpa.getId())) {
             throw new NotFoundException("Failed to create film, mpa not found");
         }
+    }
+
+    public List<FilmDto> getRecommendations(long userId) {
+        if (!userService.userExists(userId)) {
+            throw new NotFoundException("User not found");
+        }
+        return storage.findRecommendations(userId).stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
     }
 }

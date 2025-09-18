@@ -71,7 +71,7 @@ public class FilmController {
     public Collection<FilmDto> getCommonFilms(
             @RequestParam(required = true) Long userId,
             @RequestParam(required = true) Long friendId
-    ){
+    ) {
         return filmService.getCommonFilms(userId, friendId);
     }
 }

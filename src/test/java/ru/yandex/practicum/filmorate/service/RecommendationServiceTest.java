@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit-тесты для проверки функциональности {@link RecommendationService}.
+ * Unit-тесты для проверки функциональности рекомендаций.
  * Проверяет корректность формирования рекомендаций фильмов на основе SQL-реализации Slope One.
  * Используется встроенная база данных H2, с 7 пользователями для тестирования.
  */
@@ -27,7 +27,7 @@ public class RecommendationServiceTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private RecommendationService recommendationService;
+    private FilmService recommendationService;
 
     /**
      * Настройка тестовых данных перед каждым тестом.

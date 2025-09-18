@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
-import ru.yandex.practicum.filmorate.service.RecommendationService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserFriendsService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -19,7 +19,7 @@ import java.util.Collection;
 public class UserController {
     private final UserService userService;
     private final UserFriendsService friendService;
-    private final RecommendationService recommendationService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<UserDto> getAll() {
@@ -59,6 +59,6 @@ public class UserController {
     // Эндпоинт для получения рекомендаций фильмов для пользователя
     @GetMapping("/{id}/recommendations")
     public Collection<FilmDto> getRecommendations(@PathVariable Long id) {
-        return recommendationService.getRecommendations(id);
+        return filmService.getRecommendations(id);
     }
 }

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Primary
 @Repository("reviewLikesDbRepository")
-public class ReviewLikesDbRepository extends BaseDbRepository<ReviewLikes> implements ReviewLikesRepository {
+public class ReviewLikesDbRepository extends BaseDbRepositoryMapper<ReviewLikes> implements ReviewLikesRepository {
 
     private static final String FIND_BY_ID_QUERY = """
             SELECT *

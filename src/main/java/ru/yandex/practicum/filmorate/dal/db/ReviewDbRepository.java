@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Primary
 @Repository("reviewDbRepository")
-public class ReviewDbRepository extends BaseDbRepository<Review> implements ReviewRepository {
+public class ReviewDbRepository extends BaseDbRepositoryMapper<Review> implements ReviewRepository {
     private static final String FIND_ALL_QUERY = """
             SELECT *
             FROM reviews

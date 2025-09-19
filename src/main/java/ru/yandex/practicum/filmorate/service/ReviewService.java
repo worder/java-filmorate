@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dto.review.ReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.UpdateReviewRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class ReviewService {
     private final ReviewRepository storage;
     private final FilmService filmService;
     private final UserService userService;
+    private final FeedService feedService;
 
     public List<ReviewDto> getAllReviews(Long filmId, Integer count) {
 
@@ -58,6 +60,7 @@ public class ReviewService {
 
         newReview = storage.save(newReview);
         log.info("Created review: {} from data: {}", newReview, request);
+        feedService.addEvent(FeedEvent.addReview(newReview.getUserId(), newReview.getId()));
 
         return ReviewMapper.mapToReviewDto(newReview);
     }
@@ -81,18 +84,19 @@ public class ReviewService {
 
         storage.update(review);
         log.info("Updated review: {} from data: {}", review, request);
+        feedService.addEvent(FeedEvent.updateReview(review.getUserId(), review.getId()));
 
         return ReviewMapper.mapToReviewDto(review);
     }
 
 
     public void deleteReview(Long id) {
-        if (!this.isReviewExists(id)) {
-            throw new NotFoundException("Review with id=" + id + " not found");
-        }
+        Review review = storage.findById(id)
+                .orElseThrow(() -> new NotFoundException("Review with id=" + id + " not found"));
 
         storage.deleteById(id);
         log.info("Deleted review: {} from data: {}", id, this);
+        feedService.addEvent(FeedEvent.removeReview(review.getUserId(), review.getId()));
     }
 
 

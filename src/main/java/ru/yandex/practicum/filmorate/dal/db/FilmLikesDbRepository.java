@@ -28,7 +28,7 @@ public class FilmLikesDbRepository implements FilmLikesRepository {
 
     @Override
     public boolean likeExists(Long userId, Long filmId) {
-        Integer count = db.queryForObject(CHECK_EXISTS_QUERY, Integer.class , userId, filmId);
+        Integer count = db.queryForObject(CHECK_EXISTS_QUERY, Integer.class, userId, filmId);
         return count != null && count > 0;
     }
 }

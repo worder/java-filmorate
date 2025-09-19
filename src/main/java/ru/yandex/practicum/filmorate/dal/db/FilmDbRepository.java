@@ -11,10 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Primary
 @Repository("filmDbRepository")
@@ -241,6 +238,51 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
     @Override
     public void deleteById(Long id) {
         this.update(DELETE_FILM_QUERY, id);
+    }
+
+    public List<Film> search(String query, Set<String> by) {
+        boolean byTitle = by.contains("title");
+        boolean byDirector = by.contains("director");
+
+        if (!byTitle && !byDirector) byTitle = true;
+
+        String like = "%" + escapeLike(query.toLowerCase(Locale.ROOT)) + "%";
+        StringBuilder sql = new StringBuilder("(SELECT f.*, COALESCE(COUNT(fl.user_id), 0) AS likes_count FROM films f ");
+
+        sql.append("LEFT JOIN film_likes fl ON fl.film_id = f.id ");
+
+        if (byDirector) {
+            sql.append("LEFT JOIN film_directors fd ON fd.film_id = f.id ");
+            sql.append("LEFT JOIN directors d ON d.id = fd.director_id ");
+        }
+
+        List<String> predicates = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+
+        if (byTitle) {
+            predicates.add("LOWER(f.name) LIKE ? ESCAPE '\\'");
+            params.add(like);
+        }
+        if (byDirector) {
+            predicates.add("LOWER(d.name) LIKE ? ESCAPE '\\'");
+            params.add(like);
+        }
+
+        sql.append("WHERE ").append(String.join(" OR ", predicates)).append(" ");
+
+        sql.append("GROUP BY f.id ");
+        sql.append("ORDER BY likes_count DESC, f.id ASC ");
+        sql.append(")");
+
+        return this.findMany(SELECT_FILMS_TEMPLATE.formatted(sql.toString()), params.toArray());
+    }
+
+    private static String escapeLike(String s) {
+        if (s == null) return "";
+        return s
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
     }
 
     @Override

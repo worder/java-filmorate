@@ -113,6 +113,11 @@ public class InMemoryFilmRepository implements FilmRepository {
     }
 
     @Override
+    public List<Film> search(String query, Set<String> by) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public void deleteById(Long id) {
         storage.films.remove(id);
         storage.filmGenres.remove(id);

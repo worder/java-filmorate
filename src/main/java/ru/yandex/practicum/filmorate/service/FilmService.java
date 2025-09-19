@@ -15,8 +15,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,11 +29,6 @@ public class FilmService {
     private final MpaService mpaService;
     private final UserService userService;
     private final DirectorService directorService;
-
-    public enum FilmsSorting {
-        likes,
-        year
-    }
 
     public List<FilmDto> getAllFilms() {
         return storage.findAll().stream().map(FilmMapper::mapToFilmDto).toList();
@@ -88,6 +85,26 @@ public class FilmService {
         log.info("Deleted film id={}", id);
     }
 
+    public List<FilmDto> search(String query, String byParam) {
+        Set<String> by = Arrays.stream(byParam == null ? new String[]{"title"} : byParam.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        for (String b : by) {
+            if (!b.equals("title") && !b.equals("director")) {
+                throw new IllegalArgumentException("Invalid parameter value: " + b + ". Use 'title', 'director' or both.");
+            }
+        }
+
+        List<Film> films = storage.search(query, by);
+
+        return films.stream()
+                .map(FilmMapper::mapToFilmDto)
+                .collect(Collectors.toList());
+    }
+
     public boolean filmExists(Long id) {
         return this.storage.findById(id).isPresent();
     }
@@ -100,7 +117,6 @@ public class FilmService {
 
         return films.stream().map(FilmMapper::mapToFilmDto).toList();
     }
-
 
     private void validateGenres(Set<Genre> genres) {
         if (genres != null && !genreService.isGenresExists(genres)) {
@@ -127,5 +143,17 @@ public class FilmService {
         return storage.findRecommendations(userId).stream()
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
+    }
+
+    public List<FilmDto> getCommonFilms(Long userId, Long friendId) {
+        return storage.findCommonFilms(userId, friendId).stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
+
+    public enum FilmsSorting {
+        likes,
+        year
     }
 }

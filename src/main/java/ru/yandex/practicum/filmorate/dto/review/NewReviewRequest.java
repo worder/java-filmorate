@@ -7,6 +7,7 @@ import lombok.Value;
 @Value
 @ToString
 public class NewReviewRequest {
+    @NotNull
     String content;
 
     @NotNull

@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.dal.FilmLikesRepository;
 public class FilmLikesDbRepository implements FilmLikesRepository {
     private static final String INSERT_QUERY = "INSERT INTO film_likes (user_id, film_id) VALUES (?, ?)";
     private static final String DELETE_QUERY = "DELETE FROM film_likes WHERE user_id = ? AND film_id = ?";
+    private static final String CHECK_EXISTS_QUERY = "SELECT count(*) FROM film_likes WHERE user_id = ? AND film_id = ?";
 
     private final JdbcTemplate db;
 
@@ -23,5 +24,11 @@ public class FilmLikesDbRepository implements FilmLikesRepository {
     @Override
     public void removeLike(Long userId, Long filmId) {
         db.update(DELETE_QUERY, userId, filmId);
+    }
+
+    @Override
+    public boolean likeExists(Long userId, Long filmId) {
+        Integer count = db.queryForObject(CHECK_EXISTS_QUERY, Integer.class , userId, filmId);
+        return count != null && count > 0;
     }
 }

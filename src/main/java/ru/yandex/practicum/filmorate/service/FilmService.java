@@ -110,6 +110,10 @@ public class FilmService {
     }
 
     public List<FilmDto> getFilmsByDirectorId(Long directorId, FilmsSorting sort) {
+        if (!directorService.isExists(directorId)) {
+            throw new NotFoundException("Director not found");
+        }
+
         List<Film> films = switch (sort) {
             case year -> storage.findFilmsByDirectorIdSortByYear(directorId);
             case likes -> storage.findFilmsByDirectorIdSortByLikes(directorId);

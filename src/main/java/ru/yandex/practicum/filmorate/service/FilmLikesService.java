@@ -17,6 +17,9 @@ public class FilmLikesService {
     private final FilmLikesRepository storage;
 
     public void addLike(Long userId, Long filmId) {
+        if (storage.likeExists(userId, filmId)) {
+            return;
+        }
         if (filmService.filmExists(filmId) && userService.userExists(userId)) {
             log.info("Added like for film: {} from user: {}", filmId, userId);
             storage.addLike(userId, filmId);

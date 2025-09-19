@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 @Value
 @ToString
@@ -32,9 +32,9 @@ public class NewFilmRequest {
     @Positive(message = "Movie duration should be positive number")
     Integer duration;
 
-    Set<Genre> genres;
+    LinkedHashSet<Genre> genres;
 
-    Set<Director> directors;
+    LinkedHashSet<Director> directors;
 
     MpaRating mpa;
 }

@@ -50,6 +50,8 @@ public class FilmMapper {
         }
         if (request.hasDirectors()) {
             fb.directors(request.getDirectors());
+        } else {
+            fb.directors(null);
         }
         if (request.hasMpa()) {
             fb.mpa(request.getMpa());

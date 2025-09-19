@@ -16,6 +16,7 @@ public class ReviewDbRepository extends BaseDbRepositoryMapper<Review> implement
     private static final String FIND_ALL_QUERY = """
             SELECT *
             FROM reviews
+            ORDER BY useful DESC
             LIMIT ?
             """;
 
@@ -35,7 +36,7 @@ public class ReviewDbRepository extends BaseDbRepositoryMapper<Review> implement
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM reviews WHERE id = ?";
     private static final String UPDATE_REVIEW_QUERY = """
             UPDATE reviews
-            SET content = ?, is_positive = ?, user_id = ?, film_id = ?, useful = ?
+            SET content = ?, is_positive = ?, useful = ?
             WHERE id = ?
             """;
     private static final String DELETE_REVIEW_QUERY = """
@@ -93,8 +94,6 @@ public class ReviewDbRepository extends BaseDbRepositoryMapper<Review> implement
                 UPDATE_REVIEW_QUERY,
                 review.getContent(),
                 review.getIsPositive(),
-                review.getUserId(),
-                review.getFilmId(),
                 review.getUseful(),
                 review.getId()
         );

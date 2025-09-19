@@ -29,7 +29,6 @@ public class ReviewMapper {
     }
 
     public static Review updateReviewFields(Review review, UpdateReviewRequest request) {
-
         Review.ReviewBuilder reviewBuilder = review.toBuilder();
 
         if (request.hasContent()) {
@@ -37,8 +36,6 @@ public class ReviewMapper {
         }
 
         reviewBuilder.isPositive(request.getIsPositive());
-        reviewBuilder.userId(request.getUserId());
-        reviewBuilder.filmId(request.getFilmId());
 
         return reviewBuilder.build();
     }

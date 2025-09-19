@@ -23,7 +23,7 @@ public class FeedEventDbRepository extends BaseDbRepositoryMapper<FeedEvent> imp
             SELECT *
             FROM feed_events
             WHERE user_id = ?
-            ORDER BY event_id
+            ORDER BY time_stamp
             """;
 
     FeedEventDbRepository(JdbcTemplate db, RowMapper<FeedEvent> mapper) {

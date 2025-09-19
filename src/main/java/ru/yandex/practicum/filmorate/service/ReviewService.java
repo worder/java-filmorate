@@ -82,7 +82,7 @@ public class ReviewService {
                 .map(rev -> ReviewMapper.updateReviewFields(rev, request))
                 .orElseThrow(() -> new NotFoundException("Review update failed, review not found"));
 
-        storage.update(review);
+        review = storage.update(review);
         log.info("Updated review: {} from data: {}", review, request);
         feedService.addEvent(FeedEvent.updateReview(review.getUserId(), review.getId()));
 

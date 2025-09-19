@@ -5,7 +5,7 @@ import lombok.ToString;
 import lombok.Value;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 @Value
 @Builder(toBuilder = true)
@@ -16,7 +16,7 @@ public class Film {
     String description;
     LocalDate releaseDate;
     Integer duration;
-    Set<Genre> genres;
-    Set<Director> directors;
+    LinkedHashSet<Genre> genres;
+    LinkedHashSet<Director> directors;
     MpaRating mpa;
 }

@@ -155,14 +155,14 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
         );
 
         Set<Genre> genres = film.getGenres();
+        db.update(DELETE_FILM_GENRES_QUERY, film.getId());
         if (genres != null) {
-            db.update(DELETE_FILM_GENRES_QUERY, film.getId());
             genres.forEach(g -> db.update(INSERT_FILM_GENRE_QUERY, film.getId(), g.getId()));
         }
 
         Set<Director> directors = film.getDirectors();
+        db.update(DELETE_FILM_DIRECTORS_QUERY, film.getId());
         if (directors != null) {
-            db.update(DELETE_FILM_DIRECTORS_QUERY, film.getId());
             directors.forEach(d -> db.update(INSERT_FILM_DIRECTOR_QUERY, film.getId(), d.getId()));
         }
 

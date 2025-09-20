@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dto.film;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.ToString;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.annotation.FilmReleaseDate;
@@ -15,9 +14,7 @@ import java.time.LocalDate;
 import java.util.LinkedHashSet;
 
 @Value
-@ToString
 public class NewFilmRequest {
-    @NotNull
     @NotBlank(message = "Film name should not be empty")
     String name;
 

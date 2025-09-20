@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.dto.director;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.ToString;
 import lombok.Value;
 
 @Value
-@ToString
 public class UpdateDirectorRequest {
     @NotNull
     Long id;

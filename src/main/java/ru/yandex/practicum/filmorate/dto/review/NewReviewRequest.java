@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.dto.review;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.ToString;
 import lombok.Value;
 
 @Value
-@ToString
 public class NewReviewRequest {
     @NotNull
     String content;

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
+import ru.yandex.practicum.filmorate.exception.InvalidArgumentException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
@@ -21,6 +22,12 @@ public class UserService {
 
     public UserDto createUser(NewUserRequest request) {
         User newUser = UserMapper.mapToUser(request);
+        if (storage.findByEmail(request.getEmail()).isPresent()) {
+            throw new InvalidArgumentException("User with email: " + request.getEmail() + " already exists");
+        }
+        if (storage.findByLogin(request.getLogin()).isPresent()) {
+            throw new InvalidArgumentException("User with login: " + request.getLogin() + " already exists");
+        }
 
         newUser = storage.save(newUser);
         log.info("Created user: {} from data: {}", newUser, request);
@@ -42,13 +49,23 @@ public class UserService {
 
     public UserDto updateUser(UpdateUserRequest request) {
         User user = storage.findById(request.getId())
-                .map(u -> UserMapper.updateUserFields(u, request))
                 .orElseThrow(() -> new NotFoundException("User update failed, user not found"));
 
-        storage.update(user);
-        log.info("Updated user: {} from data: {}", user, request);
+        User updatedUser = UserMapper.updateUserFields(user, request);
 
-        return UserMapper.mapToUserDto(user);
+        if (!Objects.equals(user.getEmail(), updatedUser.getEmail())
+                && storage.findByEmail(updatedUser.getEmail()).isPresent()) {
+            throw new InvalidArgumentException("User with email: " + updatedUser.getEmail() + " already exists");
+        }
+        if (!Objects.equals(user.getLogin(), updatedUser.getLogin())
+                && storage.findByLogin(updatedUser.getLogin()).isPresent()) {
+            throw new InvalidArgumentException("User with login: " + updatedUser.getLogin() + " already exists");
+        }
+
+        storage.update(updatedUser);
+        log.info("Updated user: {} from data: {}", updatedUser, request);
+
+        return UserMapper.mapToUserDto(updatedUser);
     }
 
     public void deleteUser(Long id) {

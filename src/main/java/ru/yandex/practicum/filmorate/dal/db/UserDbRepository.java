@@ -33,6 +33,11 @@ public class UserDbRepository extends BaseDbRepositoryMapper<User> implements Us
             """;
 
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
+
+    private static final String FIND_BY_LOGIN_QUERY = "SELECT * FROM users WHERE login = ?";
+
+    private static final String FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
+
     private static final String UPDATE_USER_QUERY = """
             UPDATE users
             SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?
@@ -62,6 +67,16 @@ public class UserDbRepository extends BaseDbRepositoryMapper<User> implements Us
     @Override
     public Optional<User> findById(Long id) {
         return this.findOne(FIND_BY_ID_QUERY, id);
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        return this.findOne(FIND_BY_LOGIN_QUERY, login);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return this.findOne(FIND_BY_EMAIL_QUERY, email);
     }
 
     @Override

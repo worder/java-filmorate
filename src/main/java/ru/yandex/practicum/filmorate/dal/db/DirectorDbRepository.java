@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dal.db;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -13,7 +12,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-@Component
 @Repository("directorDbRepository")
 public class DirectorDbRepository extends BaseDbRepositoryMapper<Director> implements DirectorRepository {
 

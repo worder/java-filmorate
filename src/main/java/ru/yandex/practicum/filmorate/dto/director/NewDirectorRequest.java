@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.dto.director;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+@Jacksonized
+@Value
+@Builder
 public class NewDirectorRequest {
-    @NotNull
     @NotBlank(message = "Director name should not be empty")
-    private String name;
+    String name;
 }

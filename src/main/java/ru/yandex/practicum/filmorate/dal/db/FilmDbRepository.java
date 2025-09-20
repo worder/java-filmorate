@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dal.db;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -131,12 +134,12 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
 
         Set<Genre> genres = film.getGenres();
         if (genres != null) {
-            genres.forEach(g -> db.update(INSERT_FILM_GENRE_QUERY, newFilmId, g.getId()));
+            this.insertFilmsGenres(newFilmId, genres);
         }
 
         Set<Director> directors = film.getDirectors();
         if (directors != null) {
-            directors.forEach(d -> db.update(INSERT_FILM_DIRECTOR_QUERY, newFilmId, d.getId()));
+            this.insertFilmsDirectors(newFilmId, directors);
         }
 
         return film.toBuilder().id(newFilmId).build();
@@ -157,13 +160,13 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
         Set<Genre> genres = film.getGenres();
         db.update(DELETE_FILM_GENRES_QUERY, film.getId());
         if (genres != null) {
-            genres.forEach(g -> db.update(INSERT_FILM_GENRE_QUERY, film.getId(), g.getId()));
+            this.insertFilmsGenres(film.getId(), genres);
         }
 
         Set<Director> directors = film.getDirectors();
         db.update(DELETE_FILM_DIRECTORS_QUERY, film.getId());
         if (directors != null) {
-            directors.forEach(d -> db.update(INSERT_FILM_DIRECTOR_QUERY, film.getId(), d.getId()));
+            this.insertFilmsDirectors(film.getId(), directors);
         }
 
         return film;
@@ -288,5 +291,37 @@ public class FilmDbRepository extends BaseDbRepositoryExtractor<Film> implements
     @Override
     public List<Film> findCommonFilms(Long userId, Long friendId) {
         return this.findMany(FIND_COMMON_FILMS, userId, friendId);
+    }
+
+    private void insertFilmsGenres(Long filmId, Collection<Genre> genres) {
+        List<Genre> genresList = new ArrayList<>(genres);
+        this.db.batchUpdate(INSERT_FILM_GENRE_QUERY, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, filmId);
+                ps.setLong(2, genresList.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genresList.size();
+            }
+        });
+    }
+
+    private void insertFilmsDirectors(Long filmId, Collection<Director> directors) {
+        List<Director> directorsList = new ArrayList<>(directors);
+        this.db.batchUpdate(INSERT_FILM_DIRECTOR_QUERY, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, filmId);
+                ps.setLong(2, directorsList.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return directorsList.size();
+            }
+        });
     }
 }

@@ -28,9 +28,12 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
 
+    // Обновленный метод для получения популярных фильмов с опциональными параметрами genreId и year
     @GetMapping("/popular")
-    public Collection<FilmDto> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
-        return filmService.getPopularFilms(count);
+    public Collection<FilmDto> getPopularFilms(@RequestParam(defaultValue = "10") Integer count,
+                                               @RequestParam(required = false) Integer genreId,
+                                               @RequestParam(required = false) Integer year) {
+        return filmService.getPopularFilms(count, genreId, year);
     }
 
     @PostMapping
@@ -51,5 +54,29 @@ public class FilmController {
     @DeleteMapping("/{filmId}/like/{userId}")
     public void removeLike(@PathVariable Long filmId, @PathVariable Long userId) {
         likesService.removeLike(userId, filmId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        filmService.deleteFilm(id);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public Collection<FilmDto> getFilmsByDirector(@PathVariable Long directorId,
+                                                  @RequestParam FilmService.FilmsSorting sortBy) {
+        return filmService.getFilmsByDirectorId(directorId, sortBy);
+    }
+
+    @GetMapping("/common")
+    public Collection<FilmDto> getCommonFilms(
+            @RequestParam(required = true) Long userId,
+            @RequestParam(required = true) Long friendId
+    ) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/search")
+    public Collection<FilmDto> search(@RequestParam String query, @RequestParam(required = false) String by) {
+        return filmService.search(query, by);
     }
 }

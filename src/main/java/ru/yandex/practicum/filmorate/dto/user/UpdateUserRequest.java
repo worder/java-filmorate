@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.dto.user;
 
 import jakarta.validation.constraints.*;
-import lombok.ToString;
 import lombok.Value;
 
 import java.time.LocalDate;
 
 @Value
-@ToString
 public class UpdateUserRequest {
     @NotNull
     Long id;

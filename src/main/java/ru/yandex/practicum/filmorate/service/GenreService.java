@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,11 +24,11 @@ public class GenreService {
                 .orElseThrow(() -> new NotFoundException("Genre not found"));
     }
 
-    public Set<Genre> getFilmGenres(Long filmId) {
-        return storage.findByFilmId(filmId);
-    }
+    public boolean isGenresExists(Set<Genre> genres) {
+        Set<Integer> ids = genres.stream()
+                .map(Genre::getId)
+                .collect(Collectors.toSet());
 
-    public boolean isGenreExists(Integer genreId) {
-        return storage.findById(genreId).isPresent();
+        return storage.findByIds(ids).size() == ids.size();
     }
 }

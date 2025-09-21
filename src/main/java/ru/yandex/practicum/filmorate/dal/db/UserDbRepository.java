@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Primary
 @Repository("userDbRepository")
-public class UserDbRepository extends BaseDbRepository<User> implements UserRepository {
+public class UserDbRepository extends BaseDbRepositoryMapper<User> implements UserRepository {
     private static final String FIND_ALL_QUERY = "SELECT * FROM users";
 
     private static final String FIND_USER_FRIENDS_QUERY = """
@@ -33,10 +33,17 @@ public class UserDbRepository extends BaseDbRepository<User> implements UserRepo
             """;
 
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
+
+    private static final String FIND_BY_LOGIN_QUERY = "SELECT * FROM users WHERE login = ?";
+
+    private static final String FIND_BY_EMAIL_QUERY = "SELECT * FROM users WHERE email = ?";
+
     private static final String UPDATE_USER_QUERY = """
             UPDATE users
             SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?
             """;
+
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
 
     public UserDbRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -63,6 +70,16 @@ public class UserDbRepository extends BaseDbRepository<User> implements UserRepo
     }
 
     @Override
+    public Optional<User> findByLogin(String login) {
+        return this.findOne(FIND_BY_LOGIN_QUERY, login);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return this.findOne(FIND_BY_EMAIL_QUERY, email);
+    }
+
+    @Override
     public User save(User user) {
         long id = this.insert(
                 INSERT_USER_QUERY,
@@ -85,5 +102,10 @@ public class UserDbRepository extends BaseDbRepository<User> implements UserRepo
                 user.getId()
         );
         return user;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        this.update(DELETE_USER_QUERY, id);
     }
 }

@@ -2,17 +2,32 @@ package ru.yandex.practicum.filmorate.dal;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface FilmRepository {
-    Collection<Film> findAll();
+    List<Film> findAll();
 
-    Collection<Film> findPopular(int count);
+    // Новый метод для поиска популярных фильмов с фильтрами по жанру и году
+    List<Film> findPopular(int count, Integer genreId, Integer year);
 
     Optional<Film> findById(Long id);
 
     Film save(Film film);
 
     Film update(Film film);
+
+    List<Film> findRecommendations(long userId);
+
+
+    void deleteById(Long id);
+
+    List<Film> findFilmsByDirectorIdSortByYear(Long directorId);
+
+    List<Film> findFilmsByDirectorIdSortByLikes(Long directorId);
+
+    List<Film> search(String query, Set<String> by);
+
+    List<Film> findCommonFilms(Long userId, Long friendId);
 }
